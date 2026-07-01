@@ -1,0 +1,3 @@
+/api/* /.netlify/functions/api 200
+/*.{png,jpg,jpeg,gif,svg,ico,webp,css,js,woff,woff2,ttf,eot}  -  200
+/*  /index.html  200
