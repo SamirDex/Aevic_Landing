@@ -1,0 +1,66 @@
+.language-switcher {
+  display: flex;
+  gap: 0.18rem;
+  padding: 0.22rem;
+  border: 1px solid rgba(243, 196, 80, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.language-switcher__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-width: 2.45rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.55rem;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(240, 234, 214, 0.68);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.language-switcher__button:hover {
+  background: rgba(255, 255, 255, 0.055);
+  color: var(--color-foreground);
+}
+
+.language-switcher__button.is-active {
+  background: rgba(243, 196, 80, 0.14);
+  color: var(--color-gold);
+  box-shadow: 0 0 0.8rem rgba(243, 196, 80, 0.12);
+}
+
+.language-switcher__flag {
+  font-size: 0.78rem;
+}
+
+.language-switcher__label {
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 767px) {
+  .language-switcher {
+    gap: 0.25rem;
+    padding: 0.25rem;
+  }
+
+  .language-switcher__button {
+    min-width: 2.15rem;
+    padding: 0.35rem 0.45rem;
+    font-size: 0.7rem;
+  }
+
+  .language-switcher__flag {
+    display: none;
+  }
+}

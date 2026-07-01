@@ -1,0 +1,348 @@
+/**
+ * Responsive tiers (5 devices):
+ * 1. Phone SM  — max 374px   (kiçik telefonlar)
+ * 2. Phone     — max 479px   (standart telefonlar)
+ * 3. Tablet    — 480–767px   (planşetlər)
+ * 4. Laptop    — 768–1023px  (kiçik ekran / planşet landscape)
+ * 5. Desktop   — 1024px+     (komputerlər)
+ */
+
+:root {
+  --page-gutter: clamp(0.75rem, 4vw, 1.25rem);
+  --section-pad-y: clamp(2.5rem, 6vw, 4.3rem);
+  --touch-target: 2.75rem;
+  --nav-height: 5rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Safe area (notch telefonlar) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+
+  .site-nav {
+    margin-top: 0;
+  }
+}
+
+/* Horizontal scroll tablar — telefon / planşet */
+.tournament-slot-picker__tabs--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding-bottom: 0.35rem;
+  margin-bottom: -0.15rem;
+}
+
+.tournament-slot-picker__tabs--scroll .tournament-slot-picker__tab {
+  flex: 0 0 auto;
+}
+
+/* Cədvəllər — kiçik ekranda sürüşdürülə bilən */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-inline: calc(-1 * var(--page-gutter));
+  padding-inline: var(--page-gutter);
+}
+
+@media (min-width: 768px) {
+  .tournament-slot-picker__tabs--scroll {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .table-scroll {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+/* Touch-friendly düymələr */
+@media (max-width: 1023px) {
+  .button,
+  .site-nav__avatar,
+  .site-nav__links button,
+  .tournament-slot-picker__tab,
+  .dashboard__logout,
+  .dashboard__poster-button,
+  .admin-panel__tab,
+  .entry-slots-table__move {
+    min-height: var(--touch-target);
+  }
+}
+
+/* ——— Phone SM (≤374px) ——— */
+@media (max-width: 374px) {
+  :root {
+    --page-gutter: 0.65rem;
+  }
+
+  .section-frame,
+  .hero__container,
+  .dashboard__container {
+    width: calc(100% - 2 * var(--page-gutter));
+  }
+
+  .hero__copy h1 {
+    font-size: clamp(1.85rem, 11vw, 2.35rem);
+  }
+
+  .site-nav__brand-title {
+    font-size: 0.88rem;
+  }
+
+  .site-nav__brand-subtitle {
+    font-size: 0.72rem;
+  }
+
+  .dashboard__team-name {
+    font-size: 1.35rem;
+  }
+
+  .button,
+  .button--submit {
+    width: 100%;
+    padding-inline: 1rem;
+  }
+
+  .hero__actions .button {
+    width: 100%;
+  }
+}
+
+/* ——— Phone (≤479px) ——— */
+@media (max-width: 479px) {
+  .section-kicker,
+  .story-card__eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+  }
+
+  .register__intro h2,
+  .story__heading h2,
+  .organizer__heading h2 {
+    font-size: clamp(1.55rem, 8vw, 1.95rem);
+  }
+
+  .consent {
+    grid-template-columns: auto 1fr;
+    gap: 0.65rem;
+  }
+
+  .consent__box {
+    grid-row: 1 / span 2;
+  }
+
+  .admin-panel__logout {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .admin-panel__actions-row .button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  /* Hero mobile adjustments */
+  .hero__container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .hero__copy {
+    order: 2;
+    text-align: center;
+    padding: 0 1rem;
+  }
+
+  .hero__visual {
+    order: 1;
+    min-width: 0;
+  }
+
+  .hero-network-stage {
+    width: 100%;
+    aspect-ratio: 900 / 700;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .hero__lockup {
+    justify-content: center;
+  }
+
+  .hero__copy h1 {
+    max-width: 100%;
+    font-size: clamp(1.85rem, 11vw, 2.35rem);
+  }
+
+  .hero__subtitle {
+    max-width: 100%;
+  }
+
+  .hero-map--erangel,
+  .hero-map--rondo,
+  .hero-map--miramar {
+    width: min(91%, 23.8rem);
+  }
+
+  .hero-map--erangel {
+    top: 12%;
+    left: 10%;
+  }
+
+  .hero-map--rondo {
+    top: 30%;
+    right: 10%;
+  }
+
+  .hero-map--miramar {
+    bottom: 27%;
+    right: 20%;
+  }
+
+  .hero-crystal--core {
+    width: clamp(5rem, 17vw, 9rem);
+  }
+
+  .hero-crystal--erangel-relay,
+  .hero-crystal--rondo-relay,
+  .hero-crystal--miramar-relay {
+    width: clamp(2.5rem, 6.5vw, 4.5rem);
+  }
+
+  .hero-crystal--satellite-a,
+  .hero-crystal--satellite-b {
+    width: clamp(2rem, 5vw, 3.2rem);
+  }
+
+  .hero-map__tooltip {
+    width: min(16rem, 85vw);
+    padding: 0.75rem 0.85rem;
+    font-size: 0.9rem;
+  }
+
+  .hero-map__tooltip strong {
+    font-size: 0.9rem;
+  }
+
+  .hero-map__tooltip span,
+  .hero-map__tooltip em {
+    font-size: 0.68rem;
+  }
+}
+
+/* ——— Tablet (480–767px) ——— */
+@media (min-width: 480px) and (max-width: 767px) {
+  .dashboard__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero__countdown-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Hero responsive adjustments */
+  .hero__container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .hero__copy {
+    order: 2;
+    text-align: center;
+  }
+
+  .hero__visual {
+    order: 1;
+    min-width: 0;
+  }
+
+  .hero-network-stage {
+    width: 100%;
+    aspect-ratio: 900 / 650;
+  }
+
+  .hero__actions {
+    flex-direction: column;
+  }
+
+  .hero-map--erangel,
+  .hero-map--rondo,
+  .hero-map--miramar {
+    width: min(84%, 28rem);
+  }
+
+  .hero-map--erangel {
+    top: 10%;
+    left: 8%;
+  }
+
+  .hero-map--rondo {
+    top: 25%;
+    right: 8%;
+  }
+
+  .hero-map--miramar {
+    bottom: 12%;
+    right: 15%;
+  }
+
+  .hero-crystal--core {
+    width: clamp(6rem, 15vw, 10rem);
+  }
+
+  .hero-crystal--erangel-relay,
+  .hero-crystal--rondo-relay,
+  .hero-crystal--miramar-relay {
+    width: clamp(3rem, 7.5vw, 5rem);
+  }
+
+  .hero-crystal--satellite-a,
+  .hero-crystal--satellite-b {
+    width: clamp(2.2rem, 5.5vw, 3.5rem);
+  }
+}
+
+/* ——— Laptop (768–1023px) ——— */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dashboard__summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-panel__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ——— Desktop (1024px+) ——— */
+@media (min-width: 1024px) {
+  .dashboard__summary {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}

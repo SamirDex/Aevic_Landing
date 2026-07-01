@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "vite.config.ts",
+    "plugins/teamsApi.ts",
+    "server/teamsApiCore.ts",
+    "server/adminApi.ts",
+    "server/tournamentSchedule.ts",
+    "server/tournamentPersist.ts",
+    "server/mediaStore.ts",
+    "server/supabasePersist.ts",
+    "server/emailService.ts",
+    "server/otpStore.ts",
+    "src/types/tournament.ts"
+  ]
+}

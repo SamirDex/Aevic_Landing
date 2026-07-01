@@ -1,0 +1,83 @@
+.tcal { display: grid; gap: 0.75rem; }
+
+.tcal--empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--copy-soft);
+  border: 1px dashed var(--stroke);
+  border-radius: 1rem;
+}
+
+.tcal__day {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--stroke);
+  border-radius: 1.15rem;
+  background: rgba(255,255,255,0.02);
+  display: grid;
+  gap: 0.5rem;
+  transition: border-color 200ms ease;
+}
+
+.tcal__day--confirmed {
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.04);
+}
+
+.tcal__day--past { opacity: 0.5; }
+
+.tcal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.tcal__label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.tcal__countdown { font-size: 0.8rem; color: var(--copy-soft); font-weight: 600; }
+.tcal__countdown--live { color: #4ade80; }
+
+.tcal__date {
+  color: var(--copy);
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.tcal__btn {
+  margin-top: 0.25rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--stroke);
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--copy-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 180ms ease;
+  text-align: left;
+}
+
+.tcal__btn:hover:not(:disabled) {
+  border-color: rgba(74,222,128,0.4);
+  color: #4ade80;
+}
+
+.tcal__btn--on {
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.08);
+  color: #4ade80;
+}
+
+.tcal__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.tcal__count { font-size: 0.82rem; color: var(--copy-soft); }
+
+@media (min-width: 600px) {
+  .tcal { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+}
