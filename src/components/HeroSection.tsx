@@ -248,19 +248,6 @@ export function HeroSection() {
         aria-hidden={introOpacity < 0.05}
       >
         <div className="hero__copy hero__copy--journey">
-          <div className="hero__lockup">
-            <img
-              src="/logo.webp"
-              alt=""
-              className="hero__lockup-logo"
-              width="48"
-              height="48"
-            />
-            <span className="hero__lockup-text">
-              <span>AEVIC</span>
-              <small>ESPORTS</small>
-            </span>
-          </div>
           <span className="section-kicker">{t('hero.kicker')}</span>
           <h1>{t('hero.headline')}</h1>
           <p className="hero__subtitle">{t('hero.lede')}</p>
