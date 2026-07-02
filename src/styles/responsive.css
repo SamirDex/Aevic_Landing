@@ -201,9 +201,7 @@
     max-width: 100%;
   }
 
-  .hero-map--erangel,
-  .hero-map--rondo,
-  .hero-map--miramar {
+  .hero-map--erangel {
     width: min(91%, 23.8rem);
   }
 
@@ -212,23 +210,11 @@
     left: 10%;
   }
 
-  .hero-map--rondo {
-    top: 30%;
-    right: 10%;
-  }
-
-  .hero-map--miramar {
-    bottom: 27%;
-    right: 20%;
-  }
-
   .hero-crystal--core {
     width: clamp(5rem, 17vw, 9rem);
   }
 
-  .hero-crystal--erangel-relay,
-  .hero-crystal--rondo-relay,
-  .hero-crystal--miramar-relay {
+  .hero-crystal--erangel-relay {
     width: clamp(2.5rem, 6.5vw, 4.5rem);
   }
 
@@ -288,9 +274,7 @@
     flex-direction: column;
   }
 
-  .hero-map--erangel,
-  .hero-map--rondo,
-  .hero-map--miramar {
+  .hero-map--erangel {
     width: min(84%, 28rem);
   }
 
@@ -299,23 +283,11 @@
     left: 8%;
   }
 
-  .hero-map--rondo {
-    top: 25%;
-    right: 8%;
-  }
-
-  .hero-map--miramar {
-    bottom: 12%;
-    right: 15%;
-  }
-
   .hero-crystal--core {
     width: clamp(6rem, 15vw, 10rem);
   }
 
-  .hero-crystal--erangel-relay,
-  .hero-crystal--rondo-relay,
-  .hero-crystal--miramar-relay {
+  .hero-crystal--erangel-relay {
     width: clamp(3rem, 7.5vw, 5rem);
   }
 

@@ -91,18 +91,6 @@
   width: min(44%, 25rem);
 }
 
-.hero-map-layer--intro .hero-map--miramar {
-  top: 61%;
-  left: 7%;
-  width: min(45%, 25rem);
-}
-
-.hero-map-layer--intro .hero-map--rondo {
-  top: 66%;
-  right: 3%;
-  width: min(45%, 25rem);
-}
-
 .hero-crystal-layer--intro .hero-crystal {
   animation: none;
 }

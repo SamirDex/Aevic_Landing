@@ -1991,20 +1991,6 @@ p {
   width: min(63%, 31.5rem);
 }
 
-.hero-map--rondo {
-  top: 60%;
-  right: 15%;
-  transform: translateY(-50%);
-  width: min(56%, 28rem);
-}
-
-.hero-map--miramar {
-  top: 48%;
-  left: 15%;
-  transform: translateY(-50%);
-  width: min(56%, 28rem);
-}
-
 .hero-map__tooltip {
   position: absolute;
   z-index: 14;
@@ -2044,18 +2030,6 @@ p {
 .hero-tooltip--erangel {
   left: 57%;
   top: calc(100% - 0.9rem);
-  translate: -50% 0;
-}
-
-.hero-tooltip--rondo {
-  right: 0;
-  top: calc(100% - 0.3rem);
-  translate: 0;
-}
-
-.hero-tooltip--miramar {
-  left: 58%;
-  bottom: calc(100% - 1rem);
   translate: -50% 0;
 }
 
@@ -2134,18 +2108,6 @@ p {
 .hero-crystal--erangel-relay {
   z-index: 4;
   width: clamp(6rem, 12vw, 11rem);
-  transform: translateZ(0);
-}
-
-.hero-crystal--rondo-relay {
-  z-index: 4;
-  width: clamp(4.5rem, 9vw, 8rem);
-  transform: translateZ(0);
-}
-
-.hero-crystal--miramar-relay {
-  z-index: 4;
-  width: clamp(5rem, 11vw, 10rem);
   transform: translateZ(0);
 }
 
@@ -3360,20 +3322,6 @@ p {
     width: 70%;
   }
 
-  .hero-map--rondo {
-    top: 60%;
-    right: 10%;
-    transform: translateY(-50%);
-    width: 63%;
-  }
-
-  .hero-map--miramar {
-    top: 48%;
-    left: 10%;
-    transform: translateY(-50%);
-    width: 63%;
-  }
-
   .hero-map__tooltip {
     left: 50%;
     right: auto;
@@ -3389,14 +3337,6 @@ p {
 
   .hero-crystal--erangel-relay {
     width: clamp(3.6rem, 15vw, 6.2rem);
-  }
-
-  .hero-crystal--rondo-relay {
-    width: clamp(2.6rem, 12vw, 4.6rem);
-  }
-
-  .hero-crystal--miramar-relay {
-    width: clamp(3rem, 15vw, 5.8rem);
   }
 
   /* Register layout mobilde: info cards gizlət (yalnız form göstər) */
@@ -3561,15 +3501,6 @@ p {
 
   .hero-map--erangel {
     width: 50%;
-  }
-
-  .hero-map--rondo {
-    width: 45%;
-  }
-
-  .hero-map--miramar {
-    left: 10%;
-    width: 45%;
   }
 
   .hero-crystal--core {

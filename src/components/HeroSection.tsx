@@ -85,34 +85,14 @@ function HeroIntroScene({ opacity = 1 }: { opacity?: number }) {
           fill="none"
         >
           <path d="M450 318 L450 122" />
-          <path d="M430 338 L228 470" />
-          <path d="M470 338 L686 470" />
           <circle cx="450" cy="325" r="8" />
           <circle cx="450" cy="112" r="4" />
-          <circle cx="218" cy="478" r="4" />
-          <circle cx="698" cy="478" r="4" />
         </svg>
 
         <div className="hero-map-layer hero-map-layer--intro">
           <span className="hero-map hero-map--erangel">
             <ResponsiveJourneyImage
               asset={MAP_ASSETS.erangel}
-              alt=""
-              className="hero-map__image"
-              draggable={false}
-            />
-          </span>
-          <span className="hero-map hero-map--miramar">
-            <ResponsiveJourneyImage
-              asset={MAP_ASSETS.miramar}
-              alt=""
-              className="hero-map__image"
-              draggable={false}
-            />
-          </span>
-          <span className="hero-map hero-map--rondo">
-            <ResponsiveJourneyImage
-              asset={MAP_ASSETS.rondo}
               alt=""
               className="hero-map__image"
               draggable={false}
