@@ -403,7 +403,7 @@
   background:
     radial-gradient(circle at 50% 46%, rgba(106, 27, 154, 0.32), transparent 38%),
     linear-gradient(180deg, rgba(4, 4, 7, 0.75), rgba(4, 4, 7, 0.96));
-  box-shadow: 0 -1.4rem 4rem rgba(106, 27, 154, 0.36);
+  box-shadow: none;
   will-change: transform;
 }
 
