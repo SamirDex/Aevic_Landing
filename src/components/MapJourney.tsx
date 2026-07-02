@@ -232,13 +232,23 @@ const ERANGEL_DIMENSIONS: PlaneDimensions = {
 };
 
 const ERANGEL_POCHINKI_POINT: NormalizedPoint = {
-  u: 0.404,
-  v: 0.576,
+  u: 0.438,
+  v: 0.543,
 };
 
 const ERANGEL_MILITARY_POINT: NormalizedPoint = {
-  u: 0.536,
+  u: 0.577,
   v: 0.854,
+};
+
+const ERANGEL_STALBER_POINT: NormalizedPoint = {
+  u: 0.807,
+  v: 0.186,
+};
+
+const ERANGEL_GEORGOPOL_POINT: NormalizedPoint = {
+  u: 0.170,
+  v: 0.305,
 };
 
 const ERANGEL_OVERVIEW: CameraPose = {
@@ -256,6 +266,16 @@ const ERANGEL_MILITARY = makeCloseUpPose(
   ERANGEL_DIMENSIONS,
   86,
 );
+const ERANGEL_GEORGOPOL = makeCloseUpPose(
+  ERANGEL_GEORGOPOL_POINT,
+  ERANGEL_DIMENSIONS,
+  90,
+);
+const ERANGEL_STALBER = makeCloseUpPose(
+  ERANGEL_STALBER_POINT,
+  ERANGEL_DIMENSIONS,
+  90,
+);
 
 const ERANGEL_POCHINKI_TRANSFORM = makeImageFocus(
   ERANGEL_POCHINKI_POINT,
@@ -265,6 +285,16 @@ const ERANGEL_MILITARY_TRANSFORM = makeImageFocus(
   ERANGEL_MILITARY_POINT,
   3.05,
   { xFactor: 0.82, yFactor: 0.62 },
+);
+const ERANGEL_GEORGOPOL_TRANSFORM = makeImageFocus(
+  ERANGEL_GEORGOPOL_POINT,
+  2.85,
+  { xFactor: 0.82, yFactor: 0.64 },
+);
+const ERANGEL_STALBER_TRANSFORM = makeImageFocus(
+  ERANGEL_STALBER_POINT,
+  2.85,
+  { xFactor: 0.8, yFactor: 0.6 },
 );
 const ERANGEL_THUMBNAIL: ThumbnailBounds = {
   left: 70,
@@ -628,7 +658,7 @@ export function MapJourney({
     erangelMorphProgress *
     (1 -
       stageProgress(
-        TIMELINE.erangel.loc2Out.start,
+        TIMELINE.deadline.start - 0.02,
         TIMELINE.deadline.start,
         p,
         easeInOutCubic,
@@ -707,7 +737,7 @@ export function MapJourney({
                   )
               : p < TIMELINE.erangel.loc2Out.start
                 ? ERANGEL_MILITARY
-                : p < TIMELINE.erangel.loc2Out.end
+              : p < TIMELINE.erangel.loc2Out.end
                   ? mixPose(
                       ERANGEL_MILITARY,
                       ERANGEL_OVERVIEW,
@@ -718,7 +748,48 @@ export function MapJourney({
                         easeInOutCubic,
                       ),
                     )
-                  : ERANGEL_OVERVIEW;
+                  : p < TIMELINE.erangel.loc3Zoom.start
+                    ? ERANGEL_OVERVIEW
+                    : p < TIMELINE.erangel.loc3Zoom.end
+                      ? mixPose(
+                          ERANGEL_OVERVIEW,
+                          ERANGEL_GEORGOPOL,
+                          stageProgress(
+                            TIMELINE.erangel.loc3Zoom.start,
+                            TIMELINE.erangel.loc3Zoom.end,
+                            p,
+                            easeInOutSine,
+                          ),
+                        )
+                      : p < TIMELINE.erangel.loc3Out.start
+                        ? ERANGEL_GEORGOPOL
+                        : p < TIMELINE.erangel.loc3Out.end
+                          ? mixPose(
+                              ERANGEL_GEORGOPOL,
+                              ERANGEL_OVERVIEW,
+                              stageProgress(
+                                TIMELINE.erangel.loc3Out.start,
+                                TIMELINE.erangel.loc3Out.end,
+                                p,
+                                easeInOutCubic,
+                              ),
+                            )
+                          : p < TIMELINE.erangel.loc4Zoom.start
+                            ? ERANGEL_OVERVIEW
+                            : p < TIMELINE.erangel.loc4Zoom.end
+                              ? mixPose(
+                                  ERANGEL_OVERVIEW,
+                                  ERANGEL_STALBER,
+                                  stageProgress(
+                                    TIMELINE.erangel.loc4Zoom.start,
+                                    TIMELINE.erangel.loc4Zoom.end,
+                                    p,
+                                    easeInOutSine,
+                                  ),
+                                )
+                              : p < TIMELINE.deadline.start
+                                ? ERANGEL_STALBER
+                                : ERANGEL_OVERVIEW;
 
   const erangelMobileTransform =
     p < TIMELINE.erangel.loc1Zoom.start
@@ -762,7 +833,7 @@ export function MapJourney({
                   )
                 : p < TIMELINE.erangel.loc2Out.start
                   ? ERANGEL_MILITARY_TRANSFORM
-                  : p < TIMELINE.erangel.loc2Out.end
+                : p < TIMELINE.erangel.loc2Out.end
                     ? mixImageTransform(
                         ERANGEL_MILITARY_TRANSFORM,
                         OVERVIEW_TRANSFORM,
@@ -773,7 +844,48 @@ export function MapJourney({
                           easeInOutCubic,
                         ),
                       )
-                    : OVERVIEW_TRANSFORM;
+                    : p < TIMELINE.erangel.loc3Zoom.start
+                      ? OVERVIEW_TRANSFORM
+                      : p < TIMELINE.erangel.loc3Zoom.end
+                        ? mixImageTransform(
+                            OVERVIEW_TRANSFORM,
+                            ERANGEL_GEORGOPOL_TRANSFORM,
+                            stageProgress(
+                              TIMELINE.erangel.loc3Zoom.start,
+                              TIMELINE.erangel.loc3Zoom.end,
+                              p,
+                              easeInOutCubic,
+                            ),
+                          )
+                        : p < TIMELINE.erangel.loc3Out.start
+                          ? ERANGEL_GEORGOPOL_TRANSFORM
+                          : p < TIMELINE.erangel.loc3Out.end
+                            ? mixImageTransform(
+                                ERANGEL_GEORGOPOL_TRANSFORM,
+                                OVERVIEW_TRANSFORM,
+                                stageProgress(
+                                  TIMELINE.erangel.loc3Out.start,
+                                  TIMELINE.erangel.loc3Out.end,
+                                  p,
+                                  easeInOutCubic,
+                                ),
+                              )
+                            : p < TIMELINE.erangel.loc4Zoom.start
+                              ? OVERVIEW_TRANSFORM
+                              : p < TIMELINE.erangel.loc4Zoom.end
+                                ? mixImageTransform(
+                                    OVERVIEW_TRANSFORM,
+                                    ERANGEL_STALBER_TRANSFORM,
+                                    stageProgress(
+                                      TIMELINE.erangel.loc4Zoom.start,
+                                      TIMELINE.erangel.loc4Zoom.end,
+                                      p,
+                                      easeInOutCubic,
+                                    ),
+                                  )
+                                : p < TIMELINE.deadline.start
+                                  ? ERANGEL_STALBER_TRANSFORM
+                                  : OVERVIEW_TRANSFORM;
 
   const deadlineOffset = lerp(104, 0, deadlineProgress);
   const shouldShowErangelModel =
@@ -781,7 +893,7 @@ export function MapJourney({
     loadedModels.erangel &&
     erangelModelOpacity > 0.01 &&
     p >= TIMELINE.erangel.pngToGlb.start &&
-    p <= TIMELINE.deadline.end;
+    p < TIMELINE.deadline.start;
 
   return (
     <motion.div
