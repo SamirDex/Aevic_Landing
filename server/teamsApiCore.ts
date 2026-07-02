@@ -934,6 +934,46 @@ export const createTeamsApiHandler = (dataDir: string) => {
       return json(200, hydrateTournamentForClient(tournament));
     }
 
+    if (method === 'POST' && pathname === '/api/tournament/checkin') {
+      const checkinBody = body as { teamId?: string; dayIndex?: number; matchIndex?: number };
+      const teamId = String(checkinBody.teamId || '').trim();
+      const dayIndex = Number(checkinBody.dayIndex ?? 1);
+      const matchIndex = Number(checkinBody.matchIndex ?? 0);
+      
+      if (!teamId) {
+        return json(400, { error: 'Team ID tələb olunur.' });
+      }
+      
+      const tournament = await readTournament();
+      const day = getTournamentDay(tournament, dayIndex);
+      
+      if (!day) {
+        return json(404, { error: 'Gün tapılmadı.' });
+      }
+      
+      const match = day.matches[matchIndex];
+      if (!match) {
+        return json(404, { error: 'Oyun tapılmadı.' });
+      }
+      
+      // Initialize checked_in_teams array if not exists
+      if (!match.checked_in_teams) {
+        match.checked_in_teams = [];
+      }
+      
+      // Check if team already checked in
+      if (match.checked_in_teams.includes(teamId)) {
+        return json(200, { alreadyCheckedIn: true });
+      }
+      
+      // Add team to checked_in_teams
+      match.checked_in_teams.push(teamId);
+      
+      await writeTournament(tournament);
+      
+      return json(200, { checkedIn: true, tournament: hydrateTournamentForClient(tournament) });
+    }
+
     if (method === 'POST' && pathname === '/api/tournament/entry-slots/publish') {
       const tournament = await readTournament();
       const dayIndex = parseDayIndex(body, tournament);

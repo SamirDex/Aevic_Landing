@@ -24,7 +24,7 @@ export function Navbar() {
     { label: t('nav.register'), path: '/qeydiyyat' },
     { label: t('nav.leaderboard'), path: '/liderlik' },
     { label: t('nav.schedule'), path: '/cedvel' },
-    { label: t('nav.rules'), path: '/reqlament' },
+    { label: t('nav.rules'), path: '/reqlament', isExternal: true, href: '/assets/reqlament.pdf' },
   ];
 
   useEffect(() => {
@@ -156,6 +156,20 @@ export function Navbar() {
         <nav id="site-nav-menu" className="site-nav__links" aria-label="Section navigation">
           {links.map((link) => {
             const isActive = link.path === '/' ? location.pathname === '/' : location.pathname.startsWith(link.path);
+
+            if (link.isExternal && link.href) {
+              return (
+                <a
+                  key={link.path}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleNavigate}
+                >
+                  {link.label}
+                </a>
+              );
+            }
 
             return (
               <Link

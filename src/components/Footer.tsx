@@ -22,12 +22,14 @@ export function Footer() {
 
         <div className="site-footer__meta">
           <span>{t('footer.meta')}</span>
-          <Link
-            to="/reqlament"
+          <a
+            href="/assets/reqlament.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ background: 'transparent', border: 0, color: 'var(--copy-soft)', cursor: 'pointer', fontSize: '0.9rem', textDecoration: 'none' }}
           >
             {t('footer.rules')}
-          </Link>
+          </a>
           <div className="site-footer__socials" aria-label="AEVIC sosial linkləri">
             {socials.map((social) => (
               <a key={social.label} href={social.href} target="_blank" rel="noreferrer" className="site-footer__social-link">

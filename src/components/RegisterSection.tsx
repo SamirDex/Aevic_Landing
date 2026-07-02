@@ -6,6 +6,7 @@ import { isValidPhone } from '../lib/phone';
 import { isSupabaseConfigured, supabaseEnvHint } from '../lib/supabase';
 import { registerTeam } from '../lib/teamAuth';
 import { SectionReveal } from './SectionReveal';
+import { CapacityProgress } from './CapacityProgress';
 
 type FormData = {
   teamName: string;
@@ -425,6 +426,8 @@ export function RegisterSection() {
           </div>
         </div>
 
+        <CapacityProgress />
+
         <SectionReveal delay={0.14}>
           <form className="register-form" onSubmit={handleSubmit}>
               <div className="register-form__two-column">
@@ -557,13 +560,14 @@ export function RegisterSection() {
                 />
                 <span className="consent__box" />
                 <span>
-                  <button
-                    type="button"
+                  <a
+                    href="/assets/reqlament.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="consent__link"
-                    onClick={() => document.getElementById('regulations')?.scrollIntoView({ behavior: 'smooth' })}
                   >
                     {t('nav.rules')}
-                  </button>
+                  </a>
                   {' '}ilə razıyam.
                 </span>
               </label>

@@ -27,6 +27,7 @@ const STATUS_LABELS: Record<string, { color: string }> = {
   pending: { color: 'var(--status-pending)' },
   approved: { color: 'var(--status-approved)' },
   rejected: { color: 'var(--status-rejected)' },
+  disqualified: { color: 'var(--status-disqualified)' },
 };
 
 export function DashboardSection() {
@@ -44,6 +45,7 @@ export function DashboardSection() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [checkinLoading, setCheckinLoading] = useState(false);
   const prevRoomIdRef = useRef<string | null>(null);
   const prevPublishedAtRef = useRef<string | null>(null);
   const teamRef = useRef(team);
@@ -183,6 +185,29 @@ export function DashboardSection() {
     }
   };
 
+  const handleCheckIn = async () => {
+    if (!team?.id || !tournament) return;
+    setCheckinLoading(true);
+    try {
+      const res = await fetch('/api/tournament/checkin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teamId: team.id,
+          dayIndex: tournament.active_day_index ?? 1,
+          matchIndex: tournament.active_match_index ?? 0,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Check-in xətası');
+      await loadTournament();
+    } catch (error) {
+      console.error('Check-in xətası:', error);
+    } finally {
+      setCheckinLoading(false);
+    }
+  };
+
   if (!team) {
     return (
       <section className="dashboard" id="dashboard">
@@ -194,6 +219,38 @@ export function DashboardSection() {
             <p className="dashboard__subtitle">
               {t('dashboard.loginPrompt')} <button onClick={() => navigate('/login')} className="dashboard__inline-link">{t('dashboard.loginLink')}</button>.
             </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (team.status === 'disqualified') {
+    return (
+      <section className="dashboard" id="dashboard">
+        <div className="dashboard__container">
+          <div className="dashboard__login-wrap">
+            <span className="section-kicker">{t('dashboard.statusKicker')}</span>
+            <h2 className="dashboard__title" style={{ color: 'var(--status-disqualified)' }}>
+              {t('dashboard.statusDisqualified')}
+            </h2>
+            <p className="dashboard__subtitle">
+              <strong>{team.team_name}</strong> komandası diskvalifikasiya edilib. Əlavə məlumat üçün admin ilə əlaqə saxlayın.
+            </p>
+            {tournament?.admin_message ? (
+              <div className="dashboard__admin-message">
+                <span className="dashboard__admin-message-label">{t('dashboard.adminMessage')}</span>
+                <p className="dashboard__admin-message-text">{tournament.admin_message}</p>
+              </div>
+            ) : null}
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+              <button
+                className="button button--ghost"
+                onClick={() => { logout(); navigate('/'); }}
+              >
+                {t('dashboard.logout')}
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -550,6 +607,25 @@ export function DashboardSection() {
                     {t('dashboard.enterWithSlot')} <strong>#{myEntrySlot.slot}</strong> {t('dashboard.slotSuffix')}
                   </p>
                 ) : null}
+              </div>
+            ) : team.status === 'approved' ? (
+              <div className="dashboard__room-checkin">
+                <p className="dashboard__empty">
+                  {t('dashboard.waitingForRoom')}
+                </p>
+                {currentMatch?.checked_in_teams?.includes(String(team.id)) ? (
+                  <button className="button button--secondary" disabled>
+                    ✓ Check-in edilib
+                  </button>
+                ) : (
+                  <button 
+                    className="button button--primary" 
+                    onClick={handleCheckIn}
+                    disabled={checkinLoading}
+                  >
+                    {checkinLoading ? 'Yüklənir...' : 'Check-in et / Hazıram'}
+                  </button>
+                )}
               </div>
             ) : (
               <p className="dashboard__empty">

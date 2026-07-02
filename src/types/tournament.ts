@@ -49,6 +49,10 @@ export type TournamentMatchSlot = {
   standings_image_url?: string | null;
   standings_draft: StandingsSnapshot | null;
   standings_published: StandingsSnapshot | null;
+  /** Check-in edən komandaların ID-ləri */
+  checked_in_teams?: string[];
+  /** Check-in pəncərəsinin nə vaxt açılacağı (matç vaxtından N dəqiqə əvvəl, admin tənzimləyə bilər) */
+  checkin_opens_minutes_before?: number;
 };
 
 export type TournamentDaySlot = {
@@ -76,6 +80,8 @@ export type TournamentState = {
   team_confirmations?: Record<string, string[]>;
   /** Admin mesajı - komanda panelində görünür */
   admin_message?: string;
+  /** Maksimum komanda sayı (slot limiti) */
+  max_teams?: number;
   /** @deprecated Köhnə format — migrate olunur */
   day_label?: string;
   standings_image_url?: string | null;

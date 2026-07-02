@@ -41,6 +41,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     { label: t('admin.statusPending'), value: 'pending' },
     { label: t('admin.statusApproved'), value: 'approved' },
     { label: t('admin.statusRejected'), value: 'rejected' },
+    { label: t('admin.statusDisqualified'), value: 'disqualified' },
   ];
   const [tab, setTab] = useState<AdminTab>('teams');
   const [teams, setTeams] = useState<TeamRecord[]>([]);
@@ -611,6 +612,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                 <option value="pending">{t('admin.statusPending')}</option>
                 <option value="approved">{t('admin.statusApproved')}</option>
                 <option value="rejected">{t('admin.statusRejected')}</option>
+                <option value="disqualified">{t('admin.statusDisqualified')}</option>
               </select>
             </div>
           </div>
@@ -645,6 +647,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                         {team.status === 'pending' && t('admin.statusPending')}
                         {team.status === 'approved' && t('admin.statusApproved')}
                         {team.status === 'rejected' && t('admin.statusRejected')}
+                        {team.status === 'disqualified' && t('admin.statusDisqualified')}
                       </span>
                     </td>
                     <td>
