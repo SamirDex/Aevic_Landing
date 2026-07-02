@@ -30,8 +30,6 @@ import {
   crossfadeOpacity,
   easeInOutCubic,
   easeInOutSine,
-  easeOutBack,
-  easeOutCubic,
   easeOutExpo,
   lerp,
   pulseWithin,
@@ -384,38 +382,17 @@ function TransitionPortal({
       {visible ? (
         <motion.div
           className="map-journey__transition-portal"
-          initial={{ opacity: 0, scale: 0.92 }}
-          animate={{ opacity: local, scale: lerp(0.96, 1.05, local) }}
-          exit={{ opacity: 0, scale: 1.08 }}
-          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: local, scale: lerp(0.98, 1.03, local) }}
+          exit={{ opacity: 0, scale: 1.06 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           aria-hidden="true"
         >
-          <motion.span
-            className="map-journey__transition-ring"
-            style={{
-              opacity: local,
-              transform: `scale(${lerp(0.88, 1.08, local)})`,
-            }}
-          />
-          <motion.span
-            className="map-journey__transition-ring map-journey__transition-ring--inner"
-            style={{
-              opacity: local,
-              transform: `scale(${lerp(0.76, 1.02, local)})`,
-            }}
-          />
-          <motion.span
-            className="map-journey__transition-scan"
-            style={{
-              opacity: local,
-              transform: `translate3d(${lerp(-18, 18, local)}%, 0, 0) scaleX(${lerp(0.92, 1.12, local)})`,
-            }}
-          />
           <motion.span
             className="map-journey__transition-sweep"
             style={{
               opacity: local,
-              transform: `translate3d(0, ${lerp(14, -16, local)}%, 0)`,
+              transform: `translate3d(${lerp(-6, 6, local)}%, ${lerp(16, -10, local)}%, 0) scale(${lerp(0.94, 1.08, local)})`,
             }}
           />
         </motion.div>
@@ -453,7 +430,7 @@ function VideoLayer({
       disableRemotePlayback
       style={videoLayerStyle(
         opacity,
-        stageProgress(revealStart, revealEnd, videoProgress, easeOutCubic),
+        stageProgress(revealStart, revealEnd, videoProgress, easeOutExpo),
       )}
     />
   );
@@ -595,7 +572,7 @@ export function MapJourney({
     TIMELINE.reveal.start,
     TIMELINE.reveal.end,
     p,
-    easeOutCubic,
+    easeOutExpo,
   );
   const deadlineProgress = stageProgress(
     TIMELINE.deadline.start,
@@ -621,7 +598,7 @@ export function MapJourney({
     TIMELINE.deadline.start,
     TIMELINE.deadline.end,
     p,
-    easeOutBack,
+    easeInOutCubic,
   );
   const erangelFullscreenProgress =
     p < TIMELINE.deadline.start
@@ -642,7 +619,7 @@ export function MapJourney({
       TIMELINE.erangel.loc2Out.start,
       TIMELINE.deadline.start,
       p,
-      easeOutCubic,
+      easeInOutCubic,
     ) *
     (1 -
       stageProgress(
