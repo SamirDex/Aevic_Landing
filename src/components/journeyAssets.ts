@@ -26,6 +26,32 @@ export const MAP_ASSETS = {
     },
     sizes: '(max-width: 767px) 88vw, 46vw',
   },
+  miramar: {
+    alt: 'Miramar tactical map',
+    fallback: '/assets/maps/miramar.png',
+    avif: {
+      desktop: '/assets/optimized/maps/miramar-desktop.avif',
+      mobile: '/assets/optimized/maps/miramar-mobile.avif',
+    },
+    webp: {
+      desktop: '/assets/optimized/maps/miramar-desktop.webp',
+      mobile: '/assets/optimized/maps/miramar-mobile.webp',
+    },
+    sizes: '(max-width: 767px) 88vw, 46vw',
+  },
+  rondo: {
+    alt: 'Rondo tactical map',
+    fallback: '/assets/maps/rondo.png',
+    avif: {
+      desktop: '/assets/optimized/maps/rondo-desktop.avif',
+      mobile: '/assets/optimized/maps/rondo-mobile.avif',
+    },
+    webp: {
+      desktop: '/assets/optimized/maps/rondo-desktop.webp',
+      mobile: '/assets/optimized/maps/rondo-mobile.webp',
+    },
+    sizes: '(max-width: 767px) 88vw, 46vw',
+  },
 } as const satisfies Record<string, ResponsiveJourneyAsset>;
 
 export const CRYSTAL_ASSETS = {

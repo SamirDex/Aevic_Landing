@@ -102,6 +102,22 @@ function HeroIntroScene({ opacity = 1 }: { opacity?: number }) {
               draggable={false}
             />
           </span>
+          <span className="hero-map hero-map--miramar">
+            <ResponsiveJourneyImage
+              asset={MAP_ASSETS.miramar}
+              alt=""
+              className="hero-map__image"
+              draggable={false}
+            />
+          </span>
+          <span className="hero-map hero-map--rondo">
+            <ResponsiveJourneyImage
+              asset={MAP_ASSETS.rondo}
+              alt=""
+              className="hero-map__image"
+              draggable={false}
+            />
+          </span>
         </div>
 
         <div className="hero-crystal-layer hero-crystal-layer--intro">
