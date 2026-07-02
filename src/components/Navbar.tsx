@@ -8,9 +8,11 @@ export function Navbar() {
   const location = useLocation();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const accountRef = useRef<HTMLDivElement | null>(null);
+  const lastScrollY = useRef(0);
   const { user, logout, isAuthenticated } = useAuth();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
@@ -70,6 +72,37 @@ export function Navbar() {
     };
   }, [accountOpen]);
 
+  useEffect(() => {
+    setHidden(false);
+    lastScrollY.current = window.scrollY;
+  }, [location.pathname, menuOpen]);
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+
+    const handleScroll = () => {
+      if (menuOpen) return;
+
+      const currentY = window.scrollY;
+      const goingDown = currentY > lastScrollY.current;
+      const delta = Math.abs(currentY - lastScrollY.current);
+
+      if (currentY < 10) {
+        setHidden(false);
+      } else if (goingDown && delta > 4) {
+        setHidden(true);
+      } else if (!goingDown && delta > 4) {
+        setHidden(false);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [menuOpen]);
+
   const handleNavigate = () => {
     setMenuOpen(false);
     setAccountOpen(false);
@@ -94,7 +127,7 @@ export function Navbar() {
         />
       ) : null}
 
-      <header className={`site-nav${menuOpen ? ' is-menu-open' : ''}`}>
+      <header className={`site-nav${menuOpen ? ' is-menu-open' : ''}${hidden && !menuOpen ? ' site-nav--hidden' : ''}`}>
         <Link to="/" className="site-nav__brand" onClick={handleNavigate}>
           <img
             src="/logo.webp"

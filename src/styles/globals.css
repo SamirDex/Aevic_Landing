@@ -1166,6 +1166,12 @@ p {
     var(--color-background);
   backdrop-filter: blur(18px);
   box-shadow: 0 1.15rem 2.5rem rgba(0, 0, 0, 0.32);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.site-nav--hidden {
+  transform: translateY(-100%);
 }
 
 .site-nav__menu-toggle {
