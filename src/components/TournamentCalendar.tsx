@@ -40,11 +40,17 @@ export function TournamentCalendar({ schedule, teamId, confirmations = {}, onCon
       {schedule.map((day) => {
         const dayDate = new Date(`${day.date}T${day.time}:00`);
         const isPast = dayDate < now;
+        const isCancelled = day.status === 'cancelled';
+        const isCompleted = day.status === 'completed';
         const diffMs = dayDate.getTime() - now.getTime();
         const diffH = Math.floor(diffMs / 3600000);
         const diffD = Math.floor(diffH / 24);
         const countdown =
-          diffMs <= 0
+          isCancelled
+            ? '❌ Ləğv edildi'
+            : isCompleted
+            ? '✅ Bitdi'
+            : diffMs <= 0
             ? '🔴 Başladı'
             : diffD > 0
             ? `${diffD} gün qaldı`
@@ -60,11 +66,11 @@ export function TournamentCalendar({ schedule, teamId, confirmations = {}, onCon
         return (
           <div
             key={day.day_index}
-            className={`tcal__day${isPast ? ' tcal__day--past' : ''}${isConfirmed ? ' tcal__day--confirmed' : ''}`}
+            className={`tcal__day${isPast ? ' tcal__day--past' : ''}${isConfirmed ? ' tcal__day--confirmed' : ''}${isCancelled ? ' tcal__day--cancelled' : ''}${isCompleted ? ' tcal__day--completed' : ''}`}
           >
             <div className="tcal__head">
               <span className="tcal__label">{day.label}</span>
-              <span className={`tcal__countdown${diffMs <= 0 ? ' tcal__countdown--live' : ''}`}>
+              <span className={`tcal__countdown${diffMs <= 0 ? ' tcal__countdown--live' : ''}${isCancelled ? ' tcal__countdown--cancelled' : ''}${isCompleted ? ' tcal__countdown--completed' : ''}`}>
                 {countdown}
               </span>
             </div>
@@ -82,7 +88,7 @@ export function TournamentCalendar({ schedule, teamId, confirmations = {}, onCon
                 type="button"
                 className={`tcal__btn${isConfirmed ? ' tcal__btn--on' : ''}`}
                 onClick={() => handleToggle(day.day_index)}
-                disabled={loading === day.day_index || isPast}
+                disabled={loading === day.day_index || isPast || isCancelled}
               >
                 {loading === day.day_index
                   ? '...'

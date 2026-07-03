@@ -399,6 +399,15 @@ export function DashboardSection() {
     }
   };
 
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(`${label} kopyalandı!`);
+    } catch {
+      alert('Kopyalamaq olmadı');
+    }
+  };
+
   return (
     <section className="dashboard" id="dashboard">
       <div className="dashboard__container">
@@ -596,11 +605,33 @@ export function DashboardSection() {
               <div className="dashboard__room">
                 <div className="dashboard__room-row">
                   <span>{t('dashboard.roomId')}</span>
-                  <span className="dashboard__room-value">{displayRoomId}</span>
+                  <div className="dashboard__room-value-row">
+                    <span className="dashboard__room-value">{displayRoomId}</span>
+                    <button
+                      type="button"
+                      className="dashboard__copy-btn"
+                      onClick={() => void copyToClipboard(displayRoomId, 'Room ID')}
+                      title="Kopyala"
+                    >
+                      📋
+                    </button>
+                  </div>
                 </div>
                 <div className="dashboard__room-row">
                   <span>{t('dashboard.password')}</span>
-                  <span className="dashboard__room-value">{displayRoomPassword || '—'}</span>
+                  <div className="dashboard__room-value-row">
+                    <span className="dashboard__room-value">{displayRoomPassword || '—'}</span>
+                    {displayRoomPassword && (
+                      <button
+                        type="button"
+                        className="dashboard__copy-btn"
+                        onClick={() => void copyToClipboard(displayRoomPassword, 'Şifrə')}
+                        title="Kopyala"
+                      >
+                        📋
+                      </button>
+                    )}
+                  </div>
                 </div>
                 {myEntrySlot ? (
                   <p className="dashboard__room-note">

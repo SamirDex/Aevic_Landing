@@ -19,7 +19,6 @@ export type PersistedTeam = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string;
-  tier: string;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -41,7 +40,6 @@ type TeamRow = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string | null;
-  tier: string;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -86,7 +84,6 @@ const mapTeamRow = (row: TeamRow): PersistedTeam => ({
   player4_ign: row.player4_ign,
   player5_ign: row.player5_ign,
   logo_url: row.logo_url || '',
-  tier: row.tier,
   status: row.status,
   room_id: row.room_id,
   room_password: row.room_password,
@@ -105,7 +102,7 @@ export const createSupabasePersist = () => {
   const readTeams = async (): Promise<PersistedTeam[]> => {
     const { data, error } = await client
       .from('teams')
-      .select('id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,tier,status,room_id,room_password,match_results,created_at,reset_token')
+      .select('id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,status,room_id,room_password,match_results,created_at,reset_token')
       .order('team_name');
 
     if (error) {
@@ -146,7 +143,6 @@ export const createSupabasePersist = () => {
         player4_ign: team.player4_ign,
         player5_ign: team.player5_ign,
         logo_url: team.logo_url,
-        tier: team.tier,
         status: team.status,
         room_id: team.room_id,
         room_password: team.room_password,
@@ -185,7 +181,6 @@ export const createSupabasePersist = () => {
       'player4_ign',
       'player5_ign',
       'logo_url',
-      'tier',
       'status',
       'room_id',
       'room_password',
@@ -293,6 +288,76 @@ export const createSupabasePersist = () => {
     await client.storage.from(MEDIA_BUCKET).remove(paths);
   };
 
+  // Rate-limit functions for serverless environment
+  const checkRateLimit = async (ip: string, endpoint: string, maxRequests: number, windowMs: number): Promise<{ allowed: boolean; remaining: number }> => {
+    const now = Date.now();
+    const resetAt = now + windowMs;
+
+    // Try to find existing rate limit entry
+    const { data: existing, error: selectError } = await client
+      .from('rate_limits')
+      .select('*')
+      .eq('ip', ip)
+      .eq('endpoint', endpoint)
+      .gt('reset_at', now)
+      .maybeSingle();
+
+    if (selectError) {
+      // On error, allow request (fail open)
+      console.error('[rate-limit] Select error:', selectError);
+      return { allowed: true, remaining: maxRequests };
+    }
+
+    if (existing) {
+      const count = (existing.count as number) + 1;
+      if (count > maxRequests) {
+        return { allowed: false, remaining: 0 };
+      }
+
+      // Update count
+      const { error: updateError } = await client
+        .from('rate_limits')
+        .update({ count })
+        .eq('id', existing.id);
+
+      if (updateError) {
+        console.error('[rate-limit] Update error:', updateError);
+        return { allowed: true, remaining: maxRequests - count + 1 };
+      }
+
+      return { allowed: true, remaining: maxRequests - count };
+    }
+
+    // Create new entry
+    const { error: insertError } = await client
+      .from('rate_limits')
+      .insert({
+        ip,
+        endpoint,
+        count: 1,
+        reset_at: resetAt,
+      });
+
+    if (insertError) {
+      console.error('[rate-limit] Insert error:', insertError);
+      return { allowed: true, remaining: maxRequests - 1 };
+    }
+
+    return { allowed: true, remaining: maxRequests - 1 };
+  };
+
+  const cleanupRateLimits = async () => {
+    const now = Date.now();
+    const { error } = await client
+      .from('rate_limits')
+      .delete()
+      .lt('reset_at', now);
+
+    if (error) {
+      console.error('[rate-limit] Cleanup error:', error);
+    }
+  };
+
   return {
     readTeams,
     writeTeams,
@@ -304,5 +369,7 @@ export const createSupabasePersist = () => {
     uploadMedia,
     downloadMedia,
     removeMedia,
+    checkRateLimit,
+    cleanupRateLimits,
   };
 };

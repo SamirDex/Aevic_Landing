@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchTournament } from '../lib/tournamentApi';
+import { TeamShowcase } from '../components/TeamShowcase';
 import type { StandingsRow, TournamentState } from '../types/tournament';
 import './LeaderboardPage.css';
 
@@ -17,6 +18,7 @@ type LeaderboardTeam = {
 export function LeaderboardPage() {
   const { t } = useTranslation();
   const [teams, setTeams] = useState<LeaderboardTeam[]>([]);
+  const [publicTeams, setPublicTeams] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +41,7 @@ export function LeaderboardPage() {
 
       const teamStats = new Map<string, LeaderboardTeam>();
 
-      teamsData.forEach((team: { id: string; team_name: string; logo_url: string }) => {
+      teamsData.forEach((team: { id: string; team_name: string; logo_url: string; captain_name: string; player1_ign: string; player2_ign: string; player3_ign: string; player4_ign: string; player5_ign: string | null; status: string }) => {
         teamStats.set(team.id, {
           rank: 0,
           team_name: team.team_name,
@@ -73,6 +75,7 @@ export function LeaderboardPage() {
         .map((team, index) => ({ ...team, rank: index + 1 }));
 
       setTeams(sortedTeams);
+      setPublicTeams(teamsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('leaderboard.error'));
     } finally {
@@ -134,6 +137,25 @@ export function LeaderboardPage() {
         <button type="button" className="leaderboard__refresh" onClick={() => void loadLeaderboard()}>
           {t('leaderboard.refresh')}
         </button>
+        
+        <div className="leaderboard__showcase-section">
+          <h2 className="leaderboard__section-title">Komandalar</h2>
+          <TeamShowcase teams={publicTeams.map((team) => ({
+            id: team.id,
+            team_name: team.team_name,
+            captain_name: team.captain_name,
+            captain_contact: '',
+            email: '',
+            logo_url: team.logo_url,
+            player1_ign: team.player1_ign,
+            player2_ign: team.player2_ign,
+            player3_ign: team.player3_ign,
+            player4_ign: team.player4_ign,
+            player5_ign: team.player5_ign,
+            status: team.status,
+          }))} readonly />
+        </div>
+
         <div className="leaderboard__table-wrapper">
           <table className="leaderboard__table">
             <thead>

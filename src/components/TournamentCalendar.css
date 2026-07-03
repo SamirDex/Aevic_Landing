@@ -23,6 +23,17 @@
   background: rgba(74,222,128,0.04);
 }
 
+.tcal__day--cancelled {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.04);
+  opacity: 0.6;
+}
+
+.tcal__day--completed {
+  border-color: rgba(74,222,128,0.4);
+  background: rgba(74,222,128,0.04);
+}
+
 .tcal__day--past { opacity: 0.5; }
 
 .tcal__head {
@@ -43,6 +54,8 @@
 
 .tcal__countdown { font-size: 0.8rem; color: var(--copy-soft); font-weight: 600; }
 .tcal__countdown--live { color: #4ade80; }
+.tcal__countdown--cancelled { color: #ef4444; }
+.tcal__countdown--completed { color: #4ade80; }
 
 .tcal__date {
   color: var(--copy);

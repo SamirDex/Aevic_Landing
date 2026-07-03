@@ -44,6 +44,24 @@
   border-color: rgba(243, 196, 80, 0.6);
 }
 
+.leaderboard__showcase-section {
+  margin: 2rem 0;
+  padding: 2rem;
+  border: 1px solid var(--stroke);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+}
+
+.leaderboard__section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .leaderboard__empty {
   text-align: center;
   color: var(--copy-soft);

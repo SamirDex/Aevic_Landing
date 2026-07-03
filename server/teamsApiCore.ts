@@ -23,10 +23,10 @@ import type {
   TournamentState,
 } from '../src/types/tournament';
 
-// Rate limiter in-memory store
+// Rate limiter in-memory store (fallback for local dev)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-function checkRateLimit(ip: string, endpoint: string, maxRequests: number, windowMs: number): boolean {
+function checkRateLimitInMemory(ip: string, endpoint: string, maxRequests: number, windowMs: number): boolean {
   const key = `${ip}:${endpoint}`;
   const now = Date.now();
   const entry = rateLimitMap.get(key);
@@ -62,6 +62,26 @@ export const stopRateLimitCleanup = () => {
   }
 };
 
+// Unified rate-limit function - uses Supabase if available, falls back to in-memory
+async function checkRateLimit(
+  ip: string,
+  endpoint: string,
+  maxRequests: number,
+  windowMs: number,
+  supabaseStore: ReturnType<typeof createSupabasePersist> | null
+): Promise<boolean> {
+  if (supabaseStore && typeof supabaseStore.checkRateLimit === 'function') {
+    try {
+      const result = await supabaseStore.checkRateLimit(ip, endpoint, maxRequests, windowMs);
+      return result.allowed;
+    } catch (err) {
+      console.error('[rate-limit] Supabase error, falling back to in-memory:', err);
+      return checkRateLimitInMemory(ip, endpoint, maxRequests, windowMs);
+    }
+  }
+  return checkRateLimitInMemory(ip, endpoint, maxRequests, windowMs);
+}
+
 export type TeamsApiRequest = {
   method: string;
   pathname: string;
@@ -91,7 +111,6 @@ type StoredTeam = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string;
-  tier: string;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -118,7 +137,7 @@ type RegisterBody = {
 };
 
 const json = (status: number, payload: unknown, headers?: Record<string, string>): TeamsApiResponse => ({ status, payload, headers });
-const PUBLIC_TEAM_FIELDS = ['id', 'team_name', 'logo_url', 'status', 'tier'] as const;
+const PUBLIC_TEAM_FIELDS = ['id', 'team_name', 'logo_url', 'status'] as const;
 
 const getAdminKey = (): string => process.env.ADMIN_SERVER_KEY?.trim() ?? '';
 
@@ -371,8 +390,28 @@ export const createTeamsApiHandler = (dataDir: string) => {
       ?? apiReq.headers?.['cf-connecting-ip']
       ?? 'unknown';
 
+    // Public teams endpoint (no auth required)
+    if (method === 'GET' && pathname === '/api/teams/public') {
+      const teams = await readTeams();
+      const publicTeams = teams
+        .filter((team) => team.status === 'approved')
+        .map((team) => ({
+          id: team.id,
+          team_name: team.team_name,
+          logo_url: team.logo_url,
+          captain_name: team.captain_name,
+          player1_ign: team.player1_ign,
+          player2_ign: team.player2_ign,
+          player3_ign: team.player3_ign,
+          player4_ign: team.player4_ign,
+          player5_ign: team.player5_ign,
+          status: team.status,
+        }));
+      return json(200, publicTeams);
+    }
+
     if (method === 'POST' && pathname === '/api/admin/verify') {
-      if (!checkRateLimit(clientIp, 'admin-verify', 5, 15 * 60 * 1000)) {
+      if (!(await checkRateLimit(clientIp, 'admin-verify', 5, 15 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda admin giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.' });
       }
       return handleAdminLogin(apiReq);
@@ -392,7 +431,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
       if (!isAdminRequest(apiReq)) return json(403, { error: 'İcazə yoxdur.' });
       
       const teams = await readTeams();
-      const headers = ['ID', 'Komanda Adı', 'Kapitan Adı', 'Kapitan WP', 'Email', 'Status', 'Tier', 'Oyunçu 1', 'Oyunçu 2', 'Oyunçu 3', 'Oyunçu 4', 'Oyunçu 5', 'Qeydiyyat Tarixi', 'Admin Qeydi'];
+      const headers = ['ID', 'Komanda Adı', 'Kapitan Adı', 'Kapitan WP', 'Email', 'Status', 'Oyunçu 1', 'Oyunçu 2', 'Oyunçu 3', 'Oyunçu 4', 'Oyunçu 5', 'Qeydiyyat Tarixi', 'Admin Qeydi'];
       const csvRows = [headers.join(',')];
       
       for (const team of teams) {
@@ -403,7 +442,6 @@ export const createTeamsApiHandler = (dataDir: string) => {
           team.captain_contact,
           team.email,
           team.status,
-          team.tier,
           team.player1_ign,
           team.player2_ign,
           team.player3_ign,
@@ -459,7 +497,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
     }
 
     if (method === 'POST' && pathname === '/api/teams/login') {
-      if (!checkRateLimit(clientIp, 'login', 10, 5 * 60 * 1000)) {
+      if (!(await checkRateLimit(clientIp, 'login', 10, 5 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda giriş cəhdi. 5 dəqiqə sonra yenidən cəhd edin.' });
       }
       const loginBody = body as { email?: string; password?: string };
@@ -492,7 +530,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
 
     // POST /api/teams/forgot-password
     if (method === 'POST' && pathname === '/api/teams/forgot-password') {
-      if (!checkRateLimit(clientIp, 'forgot-password', 3, 15 * 60 * 1000)) {
+      if (!(await checkRateLimit(clientIp, 'forgot-password', 3, 15 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda sorğu. 15 dəqiqə sonra yenidən cəhd edin.' });
       }
       const { email } = body as { email?: string };
@@ -577,7 +615,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
     }
 
     if (method === 'POST' && pathname === '/api/teams') {
-      if (!checkRateLimit(clientIp, 'register', 5, 10 * 60 * 1000)) {
+      if (!(await checkRateLimit(clientIp, 'register', 5, 10 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda cəhd. 10 dəqiqə sonra yenidən cəhd edin.' });
       }
       const registerBody = body as RegisterBody & { otpCode?: string };
@@ -612,7 +650,6 @@ export const createTeamsApiHandler = (dataDir: string) => {
               player4_ign: String(savedBody.player4 || '').trim(),
               player5_ign: savedBody.player5?.trim() || null,
               logo_url: logoUrl,
-              tier: 'entry',
               status: 'pending',
               room_id: null,
               room_password: null,
@@ -642,7 +679,6 @@ export const createTeamsApiHandler = (dataDir: string) => {
           player4_ign: String(savedBody.player4 || '').trim(),
           player5_ign: savedBody.player5?.trim() || null,
           logo_url: logoUrl,
-          tier: 'entry',
           status: 'pending',
           room_id: null,
           room_password: null,
@@ -673,8 +709,8 @@ export const createTeamsApiHandler = (dataDir: string) => {
         }
         const base64Data = logoUrl.split(',')[1] ?? '';
         const approxBytes = Math.ceil((base64Data.length * 3) / 4);
-        if (approxBytes > 5 * 1024 * 1024) {
-          return json(400, { error: 'Logo faylı ən çox 5 MB ola bilər.' });
+        if (approxBytes > 2 * 1024 * 1024) {
+          return json(400, { error: 'Logo faylı ən çox 2 MB ola bilər.' });
         }
         try {
           const logoId = await persistImageUpload(logoUrl);
@@ -689,23 +725,35 @@ export const createTeamsApiHandler = (dataDir: string) => {
       await saveOtp(dataDir, email, otpCode, { ...registerBody, logoUrl }); // logoUrl artıq URL-dir
 
       // OTP emaili göndər
+      let emailSent = false;
       try {
         await sendOtpEmail(email, otpCode);
+        emailSent = true;
       } catch (err) {
         console.error('[register otp] email göndərilmədi:', err);
+      }
+
+      // Production-da email uğursuz olduqda OTP leak etmə
+      if (process.env.NODE_ENV === 'production' && !emailSent) {
+        return json(500, { error: 'Email göndərilmədi, bir az sonra yenidən cəhd edin və ya admin ilə əlaqə saxlayın.' });
+      }
+
+      // Dev mühitində email uğursuz olduqda OTP-ni göstər
+      const responsePayload: Record<string, unknown> = {
+        step: 'verify_email',
+        message: emailSent ? `${email} ünvanına kod göndərildi.` : `${email} ünvanına kod göndərilmədi (SMTP konfiqurasiya edilməyib).`,
+      };
+      if (!emailSent && process.env.NODE_ENV !== 'production') {
+        responsePayload.devOtpCode = otpCode;
         console.log(`[DEV] OTP kodu (email gəlmədi): ${otpCode}`);
       }
 
-      return json(200, {
-        step: 'verify_email',
-        message: `${email} ünvanına kod göndərildi.`,
-        ...(process.env.SMTP_USER ? {} : { devOtpCode: otpCode }),
-      });
+      return json(200, responsePayload);
     }
 
     // POST /api/teams/resend-otp
     if (method === 'POST' && pathname === '/api/teams/resend-otp') {
-      if (!checkRateLimit(clientIp, 'resend-otp', 3, 10 * 60 * 1000)) {
+      if (!(await checkRateLimit(clientIp, 'resend-otp', 3, 10 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda OTP sorğusu. 10 dəqiqə sonra yenidən cəhd edin.' });
       }
       const { email } = body as { email?: string };
@@ -724,17 +772,29 @@ export const createTeamsApiHandler = (dataDir: string) => {
       const newOtpCode = String(Math.floor(100000 + Math.random() * 900000));
       await saveOtp(dataDir, normalizedEmail, newOtpCode, otpData.registrationData || {});
 
+      let emailSent = false;
       try {
         await sendOtpEmail(normalizedEmail, newOtpCode);
+        emailSent = true;
       } catch (err) {
         console.error('[resend otp] email göndərilmədi:', err);
+      }
+
+      // Production-da email uğursuz olduqda OTP leak etmə
+      if (process.env.NODE_ENV === 'production' && !emailSent) {
+        return json(500, { error: 'Email göndərilmədi, bir az sonra yenidən cəhd edin və ya admin ilə əlaqə saxlayın.' });
+      }
+
+      // Dev mühitində email uğursuz olduqda OTP-ni göstər
+      const responsePayload: Record<string, unknown> = {
+        message: emailSent ? `${normalizedEmail} ünvanına yeni kod göndərildi.` : `${normalizedEmail} ünvanına kod göndərilmədi (SMTP konfiqurasiya edilməyib).`,
+      };
+      if (!emailSent && process.env.NODE_ENV !== 'production') {
+        responsePayload.devOtpCode = newOtpCode;
         console.log(`[DEV] Yeni OTP kodu (email gəlmədi): ${newOtpCode}`);
       }
 
-      return json(200, {
-        message: `${normalizedEmail} ünvanına yeni kod göndərildi.`,
-        ...(process.env.SMTP_USER ? {} : { devOtpCode: newOtpCode }),
-      });
+      return json(200, responsePayload);
     }
 
     if (method === 'DELETE' && pathname.startsWith('/api/teams/')) {
@@ -766,9 +826,89 @@ export const createTeamsApiHandler = (dataDir: string) => {
     }
 
     if (method === 'PATCH' && pathname.startsWith('/api/teams/')) {
+      const teamId = pathname.replace('/api/teams/', '');
+
+      // Team self-update endpoint (/api/teams/self)
+      if (teamId === 'self') {
+        const authHeader = apiReq.headers?.['authorization'] ?? '';
+        const sessionMatch = authHeader.match(/^Bearer (.+)$/);
+        if (!sessionMatch) {
+          return json(401, { error: 'İcazə yoxdur.' });
+        }
+
+        const sessionToken = sessionMatch[1];
+        const teams = await readTeams();
+        const teamIndex = teams.findIndex((t) => {
+          const teamSession = Buffer.from(`${t.id}:${t.password_hash}`).toString('base64');
+          return teamSession === sessionToken;
+        });
+
+        if (teamIndex === -1) {
+          return json(401, { error: 'İcazə yoxdur.' });
+        }
+
+        const team = teams[teamIndex];
+        const patchBody = body as {
+          teamName?: string;
+          captainName?: string;
+          captainContact?: string;
+          player1?: string;
+          player2?: string;
+          player3?: string;
+          player4?: string;
+          player5?: string;
+          logoUrl?: string;
+        };
+
+        // Update allowed fields
+        if (patchBody.teamName?.trim()) {
+          team.team_name = patchBody.teamName.trim();
+        }
+        if (patchBody.captainName?.trim()) {
+          team.captain_name = patchBody.captainName.trim();
+        }
+        if (patchBody.captainContact?.trim()) {
+          team.captain_contact = patchBody.captainContact.trim();
+        }
+        if (patchBody.player1?.trim()) {
+          team.player1_ign = patchBody.player1.trim();
+        }
+        if (patchBody.player2?.trim()) {
+          team.player2_ign = patchBody.player2.trim();
+        }
+        if (patchBody.player3?.trim()) {
+          team.player3_ign = patchBody.player3.trim();
+        }
+        if (patchBody.player4?.trim()) {
+          team.player4_ign = patchBody.player4.trim();
+        }
+        if (patchBody.player5 !== undefined) {
+          team.player5_ign = patchBody.player5?.trim() || null;
+        }
+        if (patchBody.logoUrl?.startsWith('data:')) {
+          if (!patchBody.logoUrl.startsWith('data:image/png')) {
+            return json(400, { error: 'Logo yalnız PNG formatında olmalıdır.' });
+          }
+          const base64Data = patchBody.logoUrl.split(',')[1] ?? '';
+          const approxBytes = Math.ceil((base64Data.length * 3) / 4);
+          if (approxBytes > 2 * 1024 * 1024) {
+            return json(400, { error: 'Logo faylı ən çox 2 MB ola bilər.' });
+          }
+          try {
+            const logoId = await persistImageUpload(patchBody.logoUrl);
+            team.logo_url = `/api/media/${logoId}`;
+          } catch {
+            return json(400, { error: 'Loqo şəkli yüklənmədi.' });
+          }
+        }
+
+        await writeTeams(teams);
+        return json(200, stripSensitiveFields(team));
+      }
+
+      // Admin-only update endpoint
       if (!isAdminRequest(apiReq)) return json(403, { error: 'İcazə yoxdur.' });
 
-      const teamId = pathname.replace('/api/teams/', '');
       const patchBody = body as {
         newPassword?: string | null;
         status?: string | null;

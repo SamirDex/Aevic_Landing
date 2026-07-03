@@ -41,7 +41,6 @@ export type TeamRecord = {
   room_password?: string | null;
   status?: string | null;
   team_name: string;
-  tier?: string | null;
   admin_note?: string | null;
 };
 
@@ -51,6 +50,18 @@ export type TeamAdminUpdate = {
   roomPassword?: null | string;
   status?: null | string;
   adminNote?: null | string;
+};
+
+export type TeamSelfUpdate = {
+  teamName?: string;
+  captainName?: string;
+  captainContact?: string;
+  player1?: string;
+  player2?: string;
+  player3?: string;
+  player4?: string;
+  player5?: string;
+  logoUrl?: string;
 };
 
 const SESSION_KEY = 'aevic_team';
@@ -147,6 +158,40 @@ export const updateTeamAdmin = async (teamId: number | string, updates: TeamAdmi
   }
 
   return res.json();
+};
+
+export const updateTeamSelf = async (updates: TeamSelfUpdate) => {
+  const team = getSession();
+  if (!team || !team.id || !team.password_hash) {
+    throw new Error('Sessiya tapılmadı.');
+  }
+
+  const sessionToken = btoa(`${team.id}:${team.password_hash}`);
+  const payload: Record<string, unknown> = {};
+  if (updates.teamName !== undefined) payload.teamName = updates.teamName;
+  if (updates.captainName !== undefined) payload.captainName = updates.captainName;
+  if (updates.captainContact !== undefined) payload.captainContact = updates.captainContact;
+  if (updates.player1 !== undefined) payload.player1 = updates.player1;
+  if (updates.player2 !== undefined) payload.player2 = updates.player2;
+  if (updates.player3 !== undefined) payload.player3 = updates.player3;
+  if (updates.player4 !== undefined) payload.player4 = updates.player4;
+  if (updates.player5 !== undefined) payload.player5 = updates.player5;
+  if (updates.logoUrl !== undefined) payload.logoUrl = updates.logoUrl;
+
+  const res = await fetch('/api/teams/self', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? 'Yeniləmə uğursuz oldu.');
+  }
+
+  const updatedTeam = await res.json();
+  saveSession(updatedTeam);
+  return updatedTeam;
 };
 
 export const saveSession = (team: TeamRecord) => {

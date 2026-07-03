@@ -16,7 +16,6 @@ create table if not exists public.teams (
   player4_ign text not null,
   player5_ign text,
   logo_url text,
-  tier text not null default 'entry',
   status text not null default 'pending',
   room_id text,
   room_password text,
@@ -98,3 +97,39 @@ create policy "aevic_media_public_delete"
 -- Migration: mövcud cədvələ reset_token sütununu əlavə et (əgər yoxdursa)
 alter table public.teams add column if not exists reset_token text;
 alter table public.teams add column if not exists reset_token_expiry bigint;
+
+-- Migration: tier sütununu sil (Phase 1 üçün lazım deyil)
+alter table public.teams drop column if exists tier;
+
+-- Rate-limit cədvəli (serverless mühit üçün)
+create table if not exists public.rate_limits (
+  id bigint generated always as identity primary key,
+  ip text not null,
+  endpoint text not null,
+  count integer not null default 1,
+  reset_at bigint not null,
+  created_at timestamptz not null default now()
+);
+
+-- Index for faster lookups
+create index if not exists rate_limits_ip_endpoint_idx on public.rate_limits(ip, endpoint);
+
+-- RLS policies for rate_limits
+alter table public.rate_limits enable row level security;
+
+drop policy if exists "rate_limits_service_insert" on public.rate_limits;
+drop policy if exists "rate_limits_service_update" on public.rate_limits;
+drop policy if exists "rate_limits_service_select" on public.rate_limits;
+drop policy if exists "rate_limits_service_delete" on public.rate_limits;
+
+create policy "rate_limits_service_insert" on rate_limits
+  for insert to service_role with check (true);
+
+create policy "rate_limits_service_update" on rate_limits
+  for update to service_role using (true);
+
+create policy "rate_limits_service_select" on rate_limits
+  for select to service_role using (true);
+
+create policy "rate_limits_service_delete" on rate_limits
+  for delete to service_role using (true);

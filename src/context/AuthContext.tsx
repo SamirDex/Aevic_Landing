@@ -16,7 +16,6 @@ export type TeamRecord = {
   room_password?: string | null;
   status?: string | null;
   team_name: string;
-  tier?: string | null;
   match_results?: Array<{
     image_url?: string | null;
     match_number?: number | null;

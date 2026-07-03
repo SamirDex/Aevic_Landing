@@ -1,0 +1,214 @@
+.team-showcase {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.team-showcase--empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--color-foreground-muted);
+  border: 1px dashed var(--color-stroke);
+  border-radius: var(--radius-lg);
+}
+
+.team-showcase__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.team-showcase__card {
+  position: relative;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-stroke);
+  transition: all 250ms ease;
+  overflow: hidden;
+}
+
+.team-showcase__card:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-gold);
+  box-shadow: 0 12px 32px rgba(243, 196, 80, 0.2);
+}
+
+.team-showcase__card-inner {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.team-showcase__logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.team-showcase__logo-placeholder {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-gold);
+}
+
+.team-showcase__card-info {
+  text-align: center;
+}
+
+.team-showcase__team-name {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.2;
+}
+
+.team-showcase__captain {
+  font-size: 0.85rem;
+  color: var(--color-foreground-muted);
+  margin: 0;
+}
+
+.team-showcase__tooltip {
+  position: fixed;
+  z-index: 1000;
+  width: min(400px, calc(100vw - 2rem));
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 200ms ease;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.team-showcase__tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-stroke);
+}
+
+.team-showcase__tooltip-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.team-showcase__tooltip-title h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin: 0 0 0.25rem 0;
+}
+
+.team-showcase__tooltip-captain {
+  font-size: 0.9rem;
+  color: var(--color-foreground-muted);
+  margin: 0;
+}
+
+.team-showcase__tooltip-players {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.team-showcase__player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+}
+
+.team-showcase__player-label {
+  font-size: 0.8rem;
+  color: var(--color-foreground-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.team-showcase__player-ign {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  color: var(--color-foreground);
+}
+
+.team-showcase__tooltip-footer {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-stroke);
+}
+
+.team-showcase__status {
+  padding: 0.35rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.team-showcase__status--approved {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.team-showcase__status--pending {
+  background: rgba(243, 196, 80, 0.15);
+  color: var(--color-gold);
+  border: 1px solid rgba(243, 196, 80, 0.3);
+}
+
+.team-showcase__status--rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.team-showcase__status--disqualified {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+@media (min-width: 768px) {
+  .team-showcase__grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 2rem;
+  }
+}

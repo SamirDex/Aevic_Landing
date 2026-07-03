@@ -42,11 +42,6 @@ export async function handleAdminLogin(apiReq: TeamsApiRequest): Promise<TeamsAp
   const { key } = body as { key?: string };
   const adminKey = process.env.ADMIN_SERVER_KEY?.trim() ?? '';
 
-  // Debug logging (remove in production)
-  console.log('[Admin Login] ADMIN_SERVER_KEY exists:', !!adminKey);
-  console.log('[Admin Login] Provided key exists:', !!key);
-  console.log('[Admin Login] Keys match:', key?.trim() === adminKey);
-
   if (!adminKey) {
     return { status: 500, payload: { error: 'Server configuration error: ADMIN_SERVER_KEY not set.' } };
   }

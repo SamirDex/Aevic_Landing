@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { isValidPhone } from '../lib/phone';
-import { isSupabaseConfigured, supabaseEnvHint } from '../lib/supabase';
 import { registerTeam } from '../lib/teamAuth';
 import { SectionReveal } from './SectionReveal';
 import { CapacityProgress } from './CapacityProgress';
@@ -25,7 +24,7 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData | 'logoFile', string>>;
 
-const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 
 const initialForm: FormData = {
   teamName: '',
@@ -158,7 +157,7 @@ export function RegisterSection() {
       if (logoFile.type !== 'image/png' || extension !== 'png') {
         nextErrors.logoFile = 'Logo yalnız PNG formatında olmalıdır.';
       } else if (logoFile.size > MAX_LOGO_BYTES) {
-        nextErrors.logoFile = 'Logo ən çox 5 MB ola bilər.';
+        nextErrors.logoFile = 'Logo ən çox 2 MB ola bilər.';
       }
     }
 
@@ -181,33 +180,20 @@ export function RegisterSection() {
         return;
       }
 
-      // Convert logo to base64
-      const logoUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(logoFile);
+      // Use registerTeam which includes logo compression via preparePngLogoDataUrl
+      const data = await registerTeam({
+        teamName: form.teamName,
+        captainName: form.captainName,
+        captainContact: form.captainContact,
+        email: form.email,
+        password: form.password,
+        player1: form.player1,
+        player2: form.player2,
+        player3: form.player3,
+        player4: form.player4,
+        player5: form.player5 || undefined,
+        logoFile,
       });
-
-      const res = await fetch('/api/teams', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          teamName: form.teamName,
-          captainName: form.captainName,
-          captainContact: form.captainContact,
-          email: form.email,
-          password: form.password,
-          player1: form.player1,
-          player2: form.player2,
-          player3: form.player3,
-          player4: form.player4,
-          player5: form.player5 || undefined,
-          logoUrl,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? 'Xəta baş verdi.');
 
       // Handle OTP verification step
       if (data.step === 'verify_email') {
@@ -472,7 +458,7 @@ export function RegisterSection() {
 
                   <label className="field field--logo">
                     <span>
-                      {t('register.logo')} <span className="field-hint">(yalnız PNG, max 5 MB)</span>
+                      {t('register.logo')} <span className="field-hint">(yalnız PNG, max 2 MB)</span>
                     </span>
                     <input
                       type="file"

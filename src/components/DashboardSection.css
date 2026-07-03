@@ -452,6 +452,28 @@
   background: var(--color-surface);
 }
 
+.dashboard__room-value-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard__copy-btn {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-stroke);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-elevated);
+  color: var(--color-foreground);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.dashboard__copy-btn:hover {
+  border-color: var(--color-gold);
+  background: rgba(243, 196, 80, 0.1);
+}
+
 .dashboard__room-row span:first-child,
 .dashboard__player-label {
   color: var(--color-foreground-muted);

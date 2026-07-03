@@ -28,7 +28,6 @@ export function OrganizerSection({ adminToken, onLogout }: OrganizerSectionProps
       });
 
       const data = await res.json();
-      console.log('[Admin Login Response]', res.status, data);
 
       if (res.ok) {
         setAuthorized(true);

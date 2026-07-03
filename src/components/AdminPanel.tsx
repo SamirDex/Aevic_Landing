@@ -830,6 +830,21 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                     placeholder="Məsələn: Gün 1 - Erangel"
                   />
                 </label>
+                <label className="field">
+                  <span>Status</span>
+                  <select
+                    value={row.status || 'scheduled'}
+                    onChange={(event) => {
+                      const next = [...scheduleRows];
+                      next[index] = { ...next[index], status: event.target.value as 'scheduled' | 'cancelled' | 'completed' };
+                      setScheduleRows(next);
+                    }}
+                  >
+                    <option value="scheduled">Planlaşdırılıb</option>
+                    <option value="cancelled">Ləğv edilib</option>
+                    <option value="completed">Bitib</option>
+                  </select>
+                </label>
               </div>
             ))}
 

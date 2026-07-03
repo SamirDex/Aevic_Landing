@@ -35,6 +35,7 @@ export type TournamentDaySchedule = {
   date: string;
   time: string;
   label: string;
+  status: 'scheduled' | 'cancelled' | 'completed';
 };
 
 export type TournamentMatchSlot = {
