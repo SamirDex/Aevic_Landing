@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Layout } from './components/Layout';
 import { ResetPasswordModal } from './components/ResetPasswordModal';
 
-const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.default })));
 const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
 const StoryPage = lazy(() => import('./pages/StoryPage').then(m => ({ default: m.StoryPage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));

@@ -200,43 +200,6 @@
   .hero__subtitle {
     max-width: 100%;
   }
-
-  .hero-map--erangel {
-    width: min(91%, 23.8rem);
-  }
-
-  .hero-map--erangel {
-    top: 12%;
-    left: 10%;
-  }
-
-  .hero-crystal--core {
-    width: clamp(5rem, 17vw, 9rem);
-  }
-
-  .hero-crystal--erangel-relay {
-    width: clamp(2.5rem, 6.5vw, 4.5rem);
-  }
-
-  .hero-crystal--satellite-a,
-  .hero-crystal--satellite-b {
-    width: clamp(2rem, 5vw, 3.2rem);
-  }
-
-  .hero-map__tooltip {
-    width: min(16rem, 85vw);
-    padding: 0.75rem 0.85rem;
-    font-size: 0.9rem;
-  }
-
-  .hero-map__tooltip strong {
-    font-size: 0.9rem;
-  }
-
-  .hero-map__tooltip span,
-  .hero-map__tooltip em {
-    font-size: 0.68rem;
-  }
 }
 
 /* ——— Tablet (480–767px) ——— */
@@ -265,35 +228,8 @@
     min-width: 0;
   }
 
-  .hero-network-stage {
-    width: 100%;
-    aspect-ratio: 900 / 650;
-  }
-
   .hero__actions {
     flex-direction: column;
-  }
-
-  .hero-map--erangel {
-    width: min(84%, 28rem);
-  }
-
-  .hero-map--erangel {
-    top: 10%;
-    left: 8%;
-  }
-
-  .hero-crystal--core {
-    width: clamp(6rem, 15vw, 10rem);
-  }
-
-  .hero-crystal--erangel-relay {
-    width: clamp(3rem, 7.5vw, 5rem);
-  }
-
-  .hero-crystal--satellite-a,
-  .hero-crystal--satellite-b {
-    width: clamp(2.2rem, 5.5vw, 3.5rem);
   }
 }
 
