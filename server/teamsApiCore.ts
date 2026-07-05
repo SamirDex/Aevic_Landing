@@ -118,6 +118,7 @@ type StoredTeam = {
   created_at: string;
   reset_token?: string | null;
   admin_note?: string | null;
+  rejection_reason?: string | null;
 };
 
 type RegisterBody = {
@@ -635,11 +636,21 @@ export const createTeamsApiHandler = (dataDir: string) => {
 
         // Logo artıq birinci mərhələdə persist edilib (savedBody.logoUrl artıq /api/media/... URL-dir)
         const logoUrl = String(savedBody.logoUrl || '');
+        const teamName = String(savedBody.teamName || '').trim();
+
+        // Komanda adı təkrarlanma yoxlaması (case-insensitive)
+        const teams = await readTeams();
+        const nameExists = teams.some(
+          (t) => t.team_name.toLowerCase() === teamName.toLowerCase()
+        );
+        if (nameExists) {
+          return json(409, { error: 'Bu komanda adı artıq istifadə olunur.' });
+        }
 
         if (supabaseStore) {
           try {
             const team = await supabaseStore.insertTeam({
-              team_name: String(savedBody.teamName || '').trim(),
+              team_name: teamName,
               captain_name: String(savedBody.captainName || '').trim(),
               captain_contact: String(savedBody.captainContact || '').trim(),
               email,
@@ -668,7 +679,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
 
         const team: StoredTeam = {
           id: randomUUID(),
-          team_name: String(savedBody.teamName || '').trim(),
+          team_name: teamName,
           captain_name: String(savedBody.captainName || '').trim(),
           captain_contact: String(savedBody.captainContact || '').trim(),
           email,

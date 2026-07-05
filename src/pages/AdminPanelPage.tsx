@@ -14,7 +14,6 @@ export function AdminPanelPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ key: '' }),
         });
         if (res.ok) {
           setAdminToken('authenticated');

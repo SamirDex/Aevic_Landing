@@ -21,6 +21,7 @@ import type { TournamentState, TournamentDaySchedule } from '../types/tournament
 import { StandingsTable } from './StandingsTable';
 import { ResetPasswordModal } from './ResetPasswordModal';
 import { TournamentCalendar } from './TournamentCalendar';
+import RoyalToast from './RoyalToast';
 import './DashboardSection.css';
 
 const STATUS_LABELS: Record<string, { color: string }> = {
@@ -46,6 +47,7 @@ export function DashboardSection() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [checkinLoading, setCheckinLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const prevRoomIdRef = useRef<string | null>(null);
   const prevPublishedAtRef = useRef<string | null>(null);
   const teamRef = useRef(team);
@@ -402,9 +404,9 @@ export function DashboardSection() {
   const copyToClipboard = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(`${label} kopyalandı!`);
+      setToast({ message: `${label} kopyalandı!`, type: 'success' });
     } catch {
-      alert('Kopyalamaq olmadı');
+      setToast({ message: 'Kopyalamaq olmadı', type: 'error' });
     }
   };
 
@@ -428,6 +430,12 @@ export function DashboardSection() {
                   {published?.map_label ? ` • ${published.map_label}` : ''}
                 </span>
               </div>
+              {team.status === 'rejected' && team.rejection_reason && (
+                <div className="dashboard__rejection-reason">
+                  <span className="dashboard__rejection-label">Rədd səbəbi:</span>
+                  <span className="dashboard__rejection-text">{team.rejection_reason}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -828,6 +836,14 @@ export function DashboardSection() {
           ) : null}
         </div>
       </div>
+      {toast && (
+        <RoyalToast
+          message={toast.message}
+          type={toast.type}
+          duration={2000}
+          onClose={() => setToast(null)}
+        />
+      )}
     </section>
   );
 }

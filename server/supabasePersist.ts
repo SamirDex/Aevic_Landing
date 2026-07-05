@@ -25,6 +25,7 @@ export type PersistedTeam = {
   match_results: unknown[];
   created_at: string;
   reset_token?: string | null;
+  rejection_reason?: string | null;
 };
 
 type TeamRow = {
@@ -46,6 +47,7 @@ type TeamRow = {
   match_results: unknown[] | null;
   created_at: string;
   reset_token?: string | null;
+  rejection_reason?: string | null;
 };
 
 export const getSupabaseUrl = () =>
@@ -90,6 +92,7 @@ const mapTeamRow = (row: TeamRow): PersistedTeam => ({
   match_results: row.match_results ?? [],
   created_at: row.created_at,
   reset_token: row.reset_token,
+  rejection_reason: row.rejection_reason,
 });
 
 export const createSupabasePersist = () => {
@@ -102,7 +105,7 @@ export const createSupabasePersist = () => {
   const readTeams = async (): Promise<PersistedTeam[]> => {
     const { data, error } = await client
       .from('teams')
-      .select('id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,status,room_id,room_password,match_results,created_at,reset_token')
+      .select('id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,status,room_id,room_password,match_results,created_at,reset_token,rejection_reason')
       .order('team_name');
 
     if (error) {
@@ -186,6 +189,7 @@ export const createSupabasePersist = () => {
       'room_password',
       'match_results',
       'reset_token',
+      'rejection_reason',
     ]);
 
     const safeUpdates = Object.fromEntries(

@@ -64,6 +64,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
   const [leagueTitle, setLeagueTitle] = useState('AEVIC ESPORTS LEAGUE – PUBG MOBILE');
   const [adminMessage, setAdminMessage] = useState('');
   const [adminNote, setAdminNote] = useState('');
+  const [rejectionReason, setRejectionReason] = useState('');
   const [ocrLoading, setOcrLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
   const [sharecardBgUploading, setSharecardBgUploading] = useState(false);
@@ -125,6 +126,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     setRoomId(selectedTeam.room_id ?? '');
     setRoomPassword(selectedTeam.room_password ?? '');
     setAdminNote(selectedTeam.admin_note ?? '');
+    setRejectionReason(selectedTeam.rejection_reason ?? '');
   }, [selectedTeam]);
 
   const handleSaveTeam = async () => {
@@ -136,7 +138,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     setMessage('');
 
     try {
-      const updatedTeam = await updateTeamAdmin(selectedTeam.id, { status, roomId, roomPassword, newPassword, adminNote });
+      const updatedTeam = await updateTeamAdmin(selectedTeam.id, { status, roomId, roomPassword, newPassword, adminNote, rejectionReason });
       setTeams((current) => current.map((team) => (team.id === updatedTeam.id ? updatedTeam : team)));
       setMessage(t('admin.teamUpdated'));
       setNewPassword('');
@@ -670,7 +672,11 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
                           onClick={() => {
                             setSelectedId(String(team.id ?? ''));
                             setStatus('rejected');
-                            handleSaveTeam();
+                            const reason = prompt('Rədd səbəbini yazın (ixtiyari):');
+                            if (reason !== null) {
+                              setRejectionReason(reason);
+                              handleSaveTeam();
+                            }
                           }}
                           disabled={loading || team.status === 'rejected'}
                         >

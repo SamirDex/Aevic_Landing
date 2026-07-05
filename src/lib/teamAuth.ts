@@ -42,6 +42,7 @@ export type TeamRecord = {
   status?: string | null;
   team_name: string;
   admin_note?: string | null;
+  rejection_reason?: string | null;
 };
 
 export type TeamAdminUpdate = {
@@ -50,6 +51,7 @@ export type TeamAdminUpdate = {
   roomPassword?: null | string;
   status?: null | string;
   adminNote?: null | string;
+  rejectionReason?: null | string;
 };
 
 export type TeamSelfUpdate = {
@@ -145,6 +147,7 @@ export const updateTeamAdmin = async (teamId: number | string, updates: TeamAdmi
   if (updates.roomPassword !== undefined) payload.roomPassword = updates.roomPassword;
   if (updates.newPassword !== undefined) payload.newPassword = updates.newPassword;
   if (updates.adminNote !== undefined) payload.adminNote = updates.adminNote;
+  if (updates.rejectionReason !== undefined) payload.rejectionReason = updates.rejectionReason;
 
   const res = await fetch(`/api/teams/${encodeURIComponent(String(teamId))}`, {
     method: 'PATCH',
