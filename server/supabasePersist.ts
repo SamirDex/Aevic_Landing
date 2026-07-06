@@ -19,6 +19,11 @@ export type PersistedTeam = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string;
+  player1_photo_url?: string | null;
+  player2_photo_url?: string | null;
+  player3_photo_url?: string | null;
+  player4_photo_url?: string | null;
+  player5_photo_url?: string | null;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -41,6 +46,11 @@ type TeamRow = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string | null;
+  player1_photo_url?: string | null;
+  player2_photo_url?: string | null;
+  player3_photo_url?: string | null;
+  player4_photo_url?: string | null;
+  player5_photo_url?: string | null;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -86,6 +96,11 @@ const mapTeamRow = (row: TeamRow): PersistedTeam => ({
   player4_ign: row.player4_ign,
   player5_ign: row.player5_ign,
   logo_url: row.logo_url || '',
+  player1_photo_url: row.player1_photo_url,
+  player2_photo_url: row.player2_photo_url,
+  player3_photo_url: row.player3_photo_url,
+  player4_photo_url: row.player4_photo_url,
+  player5_photo_url: row.player5_photo_url,
   status: row.status,
   room_id: row.room_id,
   room_password: row.room_password,

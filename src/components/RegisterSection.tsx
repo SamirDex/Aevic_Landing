@@ -19,6 +19,11 @@ type FormData = {
   player3: string;
   player4: string;
   player5: string;
+  player1Photo: File | null;
+  player2Photo: File | null;
+  player3Photo: File | null;
+  player4Photo: File | null;
+  player5Photo: File | null;
   agreed: boolean;
 };
 
@@ -38,6 +43,11 @@ const initialForm: FormData = {
   player3: '',
   player4: '',
   player5: '',
+  player1Photo: null,
+  player2Photo: null,
+  player3Photo: null,
+  player4Photo: null,
+  player5Photo: null,
   agreed: false,
 };
 
@@ -79,6 +89,8 @@ export function RegisterSection() {
   const [otpLoading, setOtpLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+  const [playerPhotoPreviews, setPlayerPhotoPreviews] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!logoFile) {
@@ -102,6 +114,27 @@ export function RegisterSection() {
     setMessage('');
   };
 
+  const handlePlayerPhotoChange = (playerKey: string, event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+    const fieldKey = `${playerKey}Photo` as keyof FormData;
+
+    setField(fieldKey, file as FormData[keyof FormData]);
+    
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPlayerPhotoPreviews((prev) => ({ ...prev, [playerKey]: previewUrl }));
+    } else {
+      setPlayerPhotoPreviews((prev) => {
+        const updated = { ...prev };
+        delete updated[playerKey];
+        return updated;
+      });
+    }
+    
+    setErrors((current) => ({ ...current, [fieldKey]: undefined }));
+    setMessage('');
+  };
+
   const setField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     startTransition(() => {
       setForm((current) => ({ ...current, [key]: value }));
@@ -110,59 +143,88 @@ export function RegisterSection() {
     });
   };
 
-  const validate = () => {
+  const validateStep = (step: 1 | 2 | 3) => {
     const nextErrors: FormErrors = {};
-    const normalizedEmail = form.email.trim();
 
-    if (form.teamName.trim().length < 3) {
-      nextErrors.teamName = 'Komanda adı ən azı 3 simvol olmalıdır.';
-    }
-    if (!form.captainName.trim()) {
-      nextErrors.captainName = 'Kapitan adı tələb olunur.';
-    }
-    if (!form.captainContact.trim()) {
-      nextErrors.captainContact = 'Kapitanın WhatsApp nömrəsi tələb olunur.';
-    } else if (!isValidPhone(form.captainContact)) {
-      nextErrors.captainContact = 'Düzgün telefon nömrəsi daxil edin (ən azı 9 rəqəm).';
-    }
-    if (!normalizedEmail) {
-      nextErrors.email = 'Email tələb olunur.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      nextErrors.email = 'Düzgün email ünvanı daxil edin.';
-    }
-    if (form.password.trim().length < 6) {
-      nextErrors.password = 'Şifrə ən azı 6 simvol olmalıdır.';
-    }
-    if (!form.confirmPassword.trim()) {
-      nextErrors.confirmPassword = 'Şifrəni təkrar daxil edin.';
-    } else if (form.password !== form.confirmPassword) {
-      nextErrors.confirmPassword = 'Şifrələr uyğun gəlmir.';
-    }
-
-    (['player1', 'player2', 'player3', 'player4'] as const).forEach((playerKey) => {
-      if (!form[playerKey].trim()) {
-        nextErrors[playerKey] = `${getFieldLabel(playerKey, t)} tələb olunur.`;
+    if (step === 1) {
+      if (form.teamName.trim().length < 3) {
+        nextErrors.teamName = 'Komanda adı ən azı 3 simvol olmalıdır.';
       }
-    });
-
-    if (!form.agreed) {
-      nextErrors.agreed = 'Turnir qaydaları ilə razılaşmalısınız.';
+      if (!form.captainName.trim()) {
+        nextErrors.captainName = 'Kapitan adı tələb olunur.';
+      }
+      if (!form.captainContact.trim()) {
+        nextErrors.captainContact = 'Kapitanın WhatsApp nömrəsi tələb olunur.';
+      } else if (!isValidPhone(form.captainContact)) {
+        nextErrors.captainContact = 'Düzgün telefon nömrəsi daxil edin (ən azı 9 rəqəm).';
+      }
+      if (form.password.trim().length < 6) {
+        nextErrors.password = 'Şifrə ən azı 6 simvol olmalıdır.';
+      }
+      if (!form.confirmPassword.trim()) {
+        nextErrors.confirmPassword = 'Şifrəni təkrar daxil edin.';
+      } else if (form.password !== form.confirmPassword) {
+        nextErrors.confirmPassword = 'Şifrələr uyğun gəlmir.';
+      }
+      if (!logoFile) {
+        nextErrors.logoFile = 'Komanda logosu (PNG) tələb olunur.';
+      } else {
+        const extension = logoFile.name.split('.').pop()?.toLowerCase();
+        if (logoFile.type !== 'image/png' || extension !== 'png') {
+          nextErrors.logoFile = 'Logo yalnız PNG formatında olmalıdır.';
+        } else if (logoFile.size > MAX_LOGO_BYTES) {
+          nextErrors.logoFile = 'Logo ən çox 2 MB ola bilər.';
+        }
+      }
     }
 
-    if (!logoFile) {
-      nextErrors.logoFile = 'Komanda logosu (PNG) tələb olunur.';
-    } else {
-      const extension = logoFile.name.split('.').pop()?.toLowerCase();
+    if (step === 2) {
+      (['player1', 'player2', 'player3', 'player4'] as const).forEach((playerKey) => {
+        if (!form[playerKey].trim()) {
+          nextErrors[playerKey] = `${getFieldLabel(playerKey, t)} tələb olunur.`;
+        }
+      });
+    }
 
-      if (logoFile.type !== 'image/png' || extension !== 'png') {
-        nextErrors.logoFile = 'Logo yalnız PNG formatında olmalıdır.';
-      } else if (logoFile.size > MAX_LOGO_BYTES) {
-        nextErrors.logoFile = 'Logo ən çox 2 MB ola bilər.';
+    if (step === 3) {
+      const normalizedEmail = form.email.trim();
+      if (!normalizedEmail) {
+        nextErrors.email = 'Email tələb olunur.';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+        nextErrors.email = 'Düzgün email ünvanı daxil edin.';
+      }
+      if (!form.agreed) {
+        nextErrors.agreed = 'Turnir qaydaları ilə razılaşmalısınız.';
       }
     }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
+  };
+
+  const validate = () => {
+    return validateStep(1) && validateStep(2) && validateStep(3);
+  };
+
+  const handleStepChange = (step: 1 | 2 | 3) => {
+    if (step > currentStep) {
+      if (!validateStep(currentStep)) {
+        return;
+      }
+    }
+    setCurrentStep(step);
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < 3 && validateStep(currentStep)) {
+      setCurrentStep((currentStep + 1) as 1 | 2 | 3);
+    }
+  };
+
+  const handlePrevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep((currentStep - 1) as 1 | 2 | 3);
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -192,6 +254,11 @@ export function RegisterSection() {
         player3: form.player3,
         player4: form.player4,
         player5: form.player5 || undefined,
+        player1Photo: form.player1Photo,
+        player2Photo: form.player2Photo,
+        player3Photo: form.player3Photo,
+        player4Photo: form.player4Photo,
+        player5Photo: form.player5Photo,
         logoFile,
       });
 
@@ -396,17 +463,29 @@ export function RegisterSection() {
       <div className="section-frame register__frame">
         {/* Stepper */}
         <div className="register-stepper">
-          <div className="register-stepper__step register-stepper__step--active">
-            <div className="register-stepper__step-number">1</div>
+          <div
+            className={`register-stepper__step ${currentStep === 1 ? 'register-stepper__step--active' : ''} ${currentStep > 1 ? 'register-stepper__step--completed' : ''}`}
+            onClick={() => handleStepChange(1)}
+            style={{ cursor: 'pointer' }}
+          >
+            <div className="register-stepper__step-number">{currentStep > 1 ? '✓' : '1'}</div>
             <div className="register-stepper__step-label">Komanda məlumatları</div>
           </div>
           <div className="register-stepper__arrow">→</div>
-          <div className="register-stepper__step">
-            <div className="register-stepper__step-number">2</div>
+          <div
+            className={`register-stepper__step ${currentStep === 2 ? 'register-stepper__step--active' : ''} ${currentStep > 2 ? 'register-stepper__step--completed' : ''}`}
+            onClick={() => handleStepChange(2)}
+            style={{ cursor: currentStep >= 2 ? 'pointer' : 'default' }}
+          >
+            <div className="register-stepper__step-number">{currentStep > 2 ? '✓' : '2'}</div>
             <div className="register-stepper__step-label">Oyunçular</div>
           </div>
           <div className="register-stepper__arrow">→</div>
-          <div className="register-stepper__step">
+          <div
+            className={`register-stepper__step ${currentStep === 3 ? 'register-stepper__step--active' : ''}`}
+            onClick={() => handleStepChange(3)}
+            style={{ cursor: currentStep >= 3 ? 'pointer' : 'default' }}
+          >
             <div className="register-stepper__step-number">3</div>
             <div className="register-stepper__step-label">Təsdiq</div>
           </div>
@@ -417,186 +496,237 @@ export function RegisterSection() {
         <SectionReveal delay={0.14}>
           <form className="register-form" onSubmit={handleSubmit}>
               {/* Step 1: Team Info Card */}
-              <div className="register-form__card">
-                <div className="register-form__card-header">
-                  <div className="register-form__card-icon">🏆</div>
-                  <div className="register-form__card-title">Komanda Məlumatları</div>
-                  <div className="register-form__card-sub">Əsas məlumatları daxil edin</div>
-                </div>
-                <div className="register-form__card-body">
-                  <label className="field">
-                    <span>{t('register.teamName')}</span>
-                    <input
-                      type="text"
-                      value={form.teamName}
-                      onChange={(event) => setField('teamName', event.target.value)}
-                      placeholder={t('register.teamNamePlaceholder')}
-                      className={errors.teamName ? 'has-error' : ''}
-                    />
-                    {errors.teamName ? <small className="field-error">{errors.teamName}</small> : null}
-                  </label>
-
-                  <label className="field">
-                    <span>{t('register.captainName')}</span>
-                    <input
-                      type="text"
-                      value={form.captainName}
-                      onChange={(event) => setField('captainName', event.target.value)}
-                      placeholder="Kapitanın tam adı"
-                      className={errors.captainName ? 'has-error' : ''}
-                    />
-                    {errors.captainName ? <small className="field-error">{errors.captainName}</small> : null}
-                  </label>
-
-                  <label className="field">
-                    <span>{t('register.captainContact')}</span>
-                    <input
-                      type="tel"
-                      value={form.captainContact}
-                      onChange={(event) => setField('captainContact', event.target.value)}
-                      placeholder="+994 XX XXX XX XX"
-                      className={errors.captainContact ? 'has-error' : ''}
-                    />
-                    {errors.captainContact ? <small className="field-error">{errors.captainContact}</small> : null}
-                  </label>
-
-                  <label className="field field--logo">
-                    <span>
-                      {t('register.logo')} <span className="field-hint">(yalnız PNG, max 2 MB)</span>
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/png,.png"
-                      onChange={handleLogoChange}
-                      className={errors.logoFile ? 'has-error' : ''}
-                    />
-                    {logoPreviewUrl ? (
-                      <div className="logo-preview">
-                        <img src={logoPreviewUrl} alt="Seçilmiş komanda logosu" />
-                        <span>{logoFile?.name}</span>
-                      </div>
-                    ) : null}
-                    {errors.logoFile ? <small className="field-error">{errors.logoFile}</small> : null}
-                  </label>
-
-                  <div className="form-row">
+              {currentStep === 1 && (
+                <div className="register-form__card">
+                  <div className="register-form__card-header">
+                    <div className="register-form__card-icon">🏆</div>
+                    <div className="register-form__card-title">Komanda Məlumatları</div>
+                    <div className="register-form__card-sub">Əsas məlumatları daxil edin</div>
+                  </div>
+                  <div className="register-form__card-body">
                     <label className="field">
+                      <span>{t('register.teamName')}</span>
+                      <input
+                        type="text"
+                        value={form.teamName}
+                        onChange={(event) => setField('teamName', event.target.value)}
+                        placeholder={t('register.teamNamePlaceholder')}
+                        className={errors.teamName ? 'has-error' : ''}
+                      />
+                      {errors.teamName ? <small className="field-error">{errors.teamName}</small> : null}
+                    </label>
+
+                    <label className="field">
+                      <span>{t('register.captainName')}</span>
+                      <input
+                        type="text"
+                        value={form.captainName}
+                        onChange={(event) => setField('captainName', event.target.value)}
+                        placeholder="Kapitanın tam adı"
+                        className={errors.captainName ? 'has-error' : ''}
+                      />
+                      {errors.captainName ? <small className="field-error">{errors.captainName}</small> : null}
+                    </label>
+
+                    <label className="field">
+                      <span>{t('register.captainContact')}</span>
+                      <input
+                        type="tel"
+                        value={form.captainContact}
+                        onChange={(event) => setField('captainContact', event.target.value)}
+                        placeholder="+994 XX XXX XX XX"
+                        className={errors.captainContact ? 'has-error' : ''}
+                      />
+                      {errors.captainContact ? <small className="field-error">{errors.captainContact}</small> : null}
+                    </label>
+
+                    <label className="field field--logo">
                       <span>
-                        {t('login.password')} <span className="field-hint">(panel girişi üçün)</span>
+                        {t('register.logo')} <span className="field-hint">(yalnız PNG, max 2 MB)</span>
                       </span>
                       <input
-                        type="password"
-                        autoComplete="new-password"
-                        value={form.password}
-                        onChange={(event) => setField('password', event.target.value)}
-                        placeholder="Ən azı 6 simvol"
-                        className={errors.password ? 'has-error' : ''}
+                        type="file"
+                        accept="image/png,.png"
+                        onChange={handleLogoChange}
+                        className={errors.logoFile ? 'has-error' : ''}
                       />
-                      {errors.password ? <small className="field-error">{errors.password}</small> : null}
+                      {logoPreviewUrl ? (
+                        <div className="logo-preview">
+                          <img src={logoPreviewUrl} alt="Seçilmiş komanda logosu" />
+                          <span>{logoFile?.name}</span>
+                        </div>
+                      ) : null}
+                      {errors.logoFile ? <small className="field-error">{errors.logoFile}</small> : null}
                     </label>
 
-                    <label className="field">
-                      <span>Şifrəni təsdiqlə</span>
-                      <input
-                        type="password"
-                        autoComplete="new-password"
-                        value={form.confirmPassword}
-                        onChange={(event) => setField('confirmPassword', event.target.value)}
-                        placeholder="Şifrəni təkrarla"
-                        className={errors.confirmPassword ? 'has-error' : ''}
-                      />
-                      {errors.confirmPassword ? <small className="field-error">{errors.confirmPassword}</small> : null}
-                    </label>
+                    <div className="form-row">
+                      <label className="field">
+                        <span>
+                          {t('login.password')} <span className="field-hint">(panel girişi üçün)</span>
+                        </span>
+                        <input
+                          type="password"
+                          autoComplete="new-password"
+                          value={form.password}
+                          onChange={(event) => setField('password', event.target.value)}
+                          placeholder="Ən azı 6 simvol"
+                          className={errors.password ? 'has-error' : ''}
+                        />
+                        {errors.password ? <small className="field-error">{errors.password}</small> : null}
+                      </label>
+
+                      <label className="field">
+                        <span>Şifrəni təsdiqlə</span>
+                        <input
+                          type="password"
+                          autoComplete="new-password"
+                          value={form.confirmPassword}
+                          onChange={(event) => setField('confirmPassword', event.target.value)}
+                          placeholder="Şifrəni təkrarla"
+                          className={errors.confirmPassword ? 'has-error' : ''}
+                        />
+                        {errors.confirmPassword ? <small className="field-error">{errors.confirmPassword}</small> : null}
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Step 2: Players Card */}
-              <div className="register-form__card">
-                <div className="register-form__card-header">
-                  <div className="register-form__card-icon">🎮</div>
-                  <div className="register-form__card-title">Oyunçular</div>
-                  <div className="register-form__card-sub">Komanda üzvlərinin IGN-ləri</div>
-                </div>
-                <div className="register-form__card-body">
-                  <div className="register-form__two-column">
-                    {(['player1', 'player2', 'player3', 'player4'] as const).map((playerKey) => (
-                      <label key={playerKey} className="field">
-                        <span>{getFieldLabel(playerKey as any, t)}</span>
-                        <input
-                          type="text"
-                          value={form[playerKey]}
-                          onChange={(event) => setField(playerKey, event.target.value)}
-                          placeholder={t('register.playerPlaceholder')}
-                          className={errors[playerKey] ? 'has-error' : ''}
-                        />
-                        {errors[playerKey] ? <small className="field-error">{errors[playerKey]}</small> : null}
-                      </label>
-                    ))}
+              {currentStep === 2 && (
+                <div className="register-form__card">
+                  <div className="register-form__card-header">
+                    <div className="register-form__card-icon">🎮</div>
+                    <div className="register-form__card-title">Oyunçular</div>
+                    <div className="register-form__card-sub">Komanda üzvlərinin IGN-ləri və şəkilləri</div>
                   </div>
-                  <label className="field field--full">
-                    <span>Oyunçu 5 IGN (Ehtiyat - opsional)</span>
-                    <input
-                      type="text"
-                      value={form.player5}
-                      onChange={(event) => setField('player5', event.target.value)}
-                      placeholder={t('register.playerPlaceholder')}
-                      className={errors.player5 ? 'has-error' : ''}
-                    />
-                    {errors.player5 ? <small className="field-error">{errors.player5}</small> : null}
-                  </label>
+                  <div className="register-form__card-body">
+                    {(['player1', 'player2', 'player3', 'player4'] as const).map((playerKey) => (
+                      <div key={playerKey} className="register-form__player-field">
+                        <label className="field">
+                          <span>{getFieldLabel(playerKey as any, t)}</span>
+                          <input
+                            type="text"
+                            value={form[playerKey]}
+                            onChange={(event) => setField(playerKey, event.target.value)}
+                            placeholder={t('register.playerPlaceholder')}
+                            className={errors[playerKey] ? 'has-error' : ''}
+                          />
+                          {errors[playerKey] ? <small className="field-error">{errors[playerKey]}</small> : null}
+                        </label>
+                        <label className="field field--photo">
+                          <span>Şəkil (opsional - PNG/JPG, max 2MB)</span>
+                          <input
+                            type="file"
+                            accept="image/png,image/jpeg,image/jpg"
+                            onChange={(e) => handlePlayerPhotoChange(playerKey, e)}
+                          />
+                          {playerPhotoPreviews[playerKey] && (
+                            <div className="photo-preview">
+                              <img src={playerPhotoPreviews[playerKey]} alt={`${playerKey} preview`} />
+                            </div>
+                          )}
+                        </label>
+                      </div>
+                    ))}
+                    <label className="field field--full">
+                      <span>Oyunçu 5 IGN (Ehtiyat - opsional)</span>
+                      <input
+                        type="text"
+                        value={form.player5}
+                        onChange={(event) => setField('player5', event.target.value)}
+                        placeholder={t('register.playerPlaceholder')}
+                        className={errors.player5 ? 'has-error' : ''}
+                      />
+                      {errors.player5 ? <small className="field-error">{errors.player5}</small> : null}
+                    </label>
+                    <label className="field field--photo">
+                      <span>Oyunçu 5 Şəkil (opsional)</span>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/jpg"
+                        onChange={(e) => handlePlayerPhotoChange('player5', e)}
+                      />
+                      {playerPhotoPreviews['player5'] && (
+                        <div className="photo-preview">
+                          <img src={playerPhotoPreviews['player5']} alt="player5 preview" />
+                        </div>
+                      )}
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Step 3: Contact & Confirm Card */}
-              <div className="register-form__card">
-                <div className="register-form__card-header">
-                  <div className="register-form__card-icon">✉️</div>
-                  <div className="register-form__card-title">Əlaqə və Təsdiq</div>
-                  <div className="register-form__card-sub">Email və qaydalar</div>
-                </div>
-                <div className="register-form__card-body">
-                  <label className="field field--full">
-                    <span>{t('register.email')}</span>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(event) => setField('email', event.target.value)}
-                      placeholder={t('register.emailPlaceholder')}
-                      className={errors.email ? 'has-error' : ''}
-                    />
-                    {errors.email ? <small className="field-error">{errors.email}</small> : null}
-                  </label>
+              {currentStep === 3 && (
+                <div className="register-form__card">
+                  <div className="register-form__card-header">
+                    <div className="register-form__card-icon">✉️</div>
+                    <div className="register-form__card-title">Əlaqə və Təsdiq</div>
+                    <div className="register-form__card-sub">Email və qaydalar</div>
+                  </div>
+                  <div className="register-form__card-body">
+                    <label className="field field--full">
+                      <span>{t('register.email')}</span>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={(event) => setField('email', event.target.value)}
+                        placeholder={t('register.emailPlaceholder')}
+                        className={errors.email ? 'has-error' : ''}
+                      />
+                      {errors.email ? <small className="field-error">{errors.email}</small> : null}
+                    </label>
 
-                  <label className="consent">
-                    <input
-                      type="checkbox"
-                      checked={form.agreed}
-                      onChange={(event) => setField('agreed', event.target.checked)}
-                    />
-                    <span className="consent__box" />
-                    <span>
-                      <a
-                        href="/assets/reqlament.pdf"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="consent__link"
-                      >
-                        {t('nav.rules')}
-                      </a>
-                      {' '}ilə razıyam.
-                    </span>
-                  </label>
-                  {errors.agreed ? <small className="consent__error field-error">{errors.agreed}</small> : null}
+                    <label className="consent">
+                      <input
+                        type="checkbox"
+                        checked={form.agreed}
+                        onChange={(event) => setField('agreed', event.target.checked)}
+                      />
+                      <span className="consent__box" />
+                      <span>
+                        <a
+                          href="/assets/reqlament.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="consent__link"
+                        >
+                          {t('nav.rules')}
+                        </a>
+                        {' '}ilə razıyam.
+                      </span>
+                    </label>
+                    {errors.agreed ? <small className="consent__error field-error">{errors.agreed}</small> : null}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {message ? <div className="form-message">{message}</div> : null}
 
               <div className="register-form__actions">
-                <button type="submit" className="button button--primary button--cta" disabled={status === 'loading'}>
-                  {status === 'loading' ? t('register.loading') : 'Qeydiyyatı Tamamla →'}
-                </button>
+                {currentStep > 1 && (
+                  <button
+                    type="button"
+                    className="button button--ghost"
+                    onClick={handlePrevStep}
+                  >
+                    ← Geri
+                  </button>
+                )}
+                {currentStep < 3 ? (
+                  <button
+                    type="button"
+                    className="button button--primary"
+                    onClick={handleNextStep}
+                  >
+                    Növbəti →
+                  </button>
+                ) : (
+                  <button type="submit" className="button button--primary button--cta" disabled={status === 'loading'}>
+                    {status === 'loading' ? t('register.loading') : 'Qeydiyyatı Tamamla →'}
+                  </button>
+                )}
               </div>
 
               <div className="register-form__login-link">

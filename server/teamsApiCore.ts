@@ -111,6 +111,11 @@ type StoredTeam = {
   player4_ign: string;
   player5_ign: string | null;
   logo_url: string;
+  player1_photo_url?: string | null;
+  player2_photo_url?: string | null;
+  player3_photo_url?: string | null;
+  player4_photo_url?: string | null;
+  player5_photo_url?: string | null;
   status: string;
   room_id: string | null;
   room_password: string | null;
@@ -133,6 +138,11 @@ type RegisterBody = {
   player3: string;
   player4: string;
   player5?: string;
+  player1PhotoUrl?: string;
+  player2PhotoUrl?: string;
+  player3PhotoUrl?: string;
+  player4PhotoUrl?: string;
+  player5PhotoUrl?: string;
   logoUrl: string;
   otpCode?: string;
 };
@@ -661,6 +671,11 @@ export const createTeamsApiHandler = (dataDir: string) => {
               player4_ign: String(savedBody.player4 || '').trim(),
               player5_ign: savedBody.player5?.trim() || null,
               logo_url: logoUrl,
+              player1_photo_url: savedBody.player1PhotoUrl || null,
+              player2_photo_url: savedBody.player2PhotoUrl || null,
+              player3_photo_url: savedBody.player3PhotoUrl || null,
+              player4_photo_url: savedBody.player4PhotoUrl || null,
+              player5_photo_url: savedBody.player5PhotoUrl || null,
               status: 'pending',
               room_id: null,
               room_password: null,
@@ -690,6 +705,11 @@ export const createTeamsApiHandler = (dataDir: string) => {
           player4_ign: String(savedBody.player4 || '').trim(),
           player5_ign: savedBody.player5?.trim() || null,
           logo_url: logoUrl,
+          player1_photo_url: savedBody.player1PhotoUrl || null,
+          player2_photo_url: savedBody.player2PhotoUrl || null,
+          player3_photo_url: savedBody.player3PhotoUrl || null,
+          player4_photo_url: savedBody.player4PhotoUrl || null,
+          player5_photo_url: savedBody.player5PhotoUrl || null,
           status: 'pending',
           room_id: null,
           room_password: null,

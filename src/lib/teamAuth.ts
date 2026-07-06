@@ -12,6 +12,11 @@ type TeamRegistrationData = {
   player3: string;
   player4: string;
   player5?: string;
+  player1Photo?: File | null;
+  player2Photo?: File | null;
+  player3Photo?: File | null;
+  player4Photo?: File | null;
+  player5Photo?: File | null;
   logoFile: File;
 };
 
@@ -71,6 +76,28 @@ const SESSION_KEY = 'aevic_team';
 export const registerTeam = async (formData: TeamRegistrationData) => {
   const logoUrl = await preparePngLogoDataUrl(formData.logoFile);
 
+  // Upload player photos to get URLs
+  const uploadPlayerPhoto = async (file: File | null | undefined): Promise<string | undefined> => {
+    if (!file) return undefined;
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/media/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) throw new Error('Şəkil yüklənmədi');
+    const data = await res.json();
+    return data.url;
+  };
+
+  const [player1PhotoUrl, player2PhotoUrl, player3PhotoUrl, player4PhotoUrl, player5PhotoUrl] = await Promise.all([
+    uploadPlayerPhoto(formData.player1Photo),
+    uploadPlayerPhoto(formData.player2Photo),
+    uploadPlayerPhoto(formData.player3Photo),
+    uploadPlayerPhoto(formData.player4Photo),
+    uploadPlayerPhoto(formData.player5Photo),
+  ]);
+
   const res = await fetch('/api/teams', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -86,6 +113,11 @@ export const registerTeam = async (formData: TeamRegistrationData) => {
       player4: formData.player4,
       player5: formData.player5 || undefined,
       logoUrl,
+      player1PhotoUrl,
+      player2PhotoUrl,
+      player3PhotoUrl,
+      player4PhotoUrl,
+      player5PhotoUrl,
     }),
   });
 
