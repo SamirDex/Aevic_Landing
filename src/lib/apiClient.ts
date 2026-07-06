@@ -30,10 +30,3 @@ export const parseApiResponse = async <T>(response: Response): Promise<T> => {
 
   return payload as T;
 };
-
-export const getAdminHeaders = (): Record<string, string> => {
-  // Cookie-based authentication is handled by the browser automatically
-  // This function is kept for compatibility but returns empty headers
-  // since cookies are sent automatically by the browser
-  return {};
-};

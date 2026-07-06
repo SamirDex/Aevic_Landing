@@ -2,7 +2,6 @@ import { type FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { attachTeamIds, extractStandingsFromImage } from '../lib/standingsParser';
 import { fileToDataUrl } from '../lib/imageData';
-import { getAdminHeaders } from '../lib/apiClient';
 import {
   createDefaultTournamentState,
   getMatchSlot,
@@ -179,7 +178,7 @@ export function AdminPanel({ onLogout }: { onLogout: () => void }) {
     setMessage('');
 
     try {
-      const res = await fetch('/api/admin/export/csv', { headers: getAdminHeaders() });
+      const res = await fetch('/api/admin/export/csv');
       if (!res.ok) throw new Error(t('admin.csvExportFailed'));
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);

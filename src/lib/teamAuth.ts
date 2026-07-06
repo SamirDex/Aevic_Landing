@@ -1,5 +1,4 @@
 import { preparePngLogoDataUrl } from './logo';
-import { getAdminHeaders } from './apiClient';
 
 type TeamRegistrationData = {
   teamName: string;
@@ -159,7 +158,7 @@ export const getTeamById = async (teamId: number | string) => {
 };
 
 export const listTeams = async () => {
-  const res = await fetch('/api/teams', { headers: getAdminHeaders() });
+  const res = await fetch('/api/teams');
   if (!res.ok) throw new Error('Komandalar yüklənmədi.');
   return res.json();
 };
@@ -167,7 +166,6 @@ export const listTeams = async () => {
 export const deleteTeam = async (teamId: number | string) => {
   const res = await fetch(`/api/teams/${encodeURIComponent(String(teamId))}`, {
     method: 'DELETE',
-    headers: getAdminHeaders(),
   });
   if (!res.ok) throw new Error('Silmə uğursuz oldu.');
 };
@@ -183,7 +181,7 @@ export const updateTeamAdmin = async (teamId: number | string, updates: TeamAdmi
 
   const res = await fetch(`/api/teams/${encodeURIComponent(String(teamId))}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
 

@@ -1,4 +1,4 @@
-import { getAdminHeaders, parseApiResponse } from './apiClient';
+import { parseApiResponse } from './apiClient';
 import type { EntrySlotRow, StandingsRow, TournamentSlotRef, TournamentState } from '../types/tournament';
 
 export type SlotPayload = TournamentSlotRef & {
@@ -15,7 +15,7 @@ export const uploadStandingsImage = async (slot: TournamentSlotRef, imageDataUrl
   parseApiResponse<TournamentState>(
     await fetch('/api/tournament/standings/image', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...slot, imageDataUrl }),
     }),
   );
@@ -24,7 +24,7 @@ export const uploadSharecardBackground = async (imageDataUrl: string) =>
   parseApiResponse<TournamentState>(
     await fetch('/api/tournament/sharecard/background', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageDataUrl }),
     }),
   );
@@ -39,7 +39,7 @@ export const saveTournamentDraft = async (
   parseApiResponse<TournamentState>(
     await fetch('/api/tournament/standings/draft', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     }),
   );
@@ -48,7 +48,7 @@ export const publishTournamentStandings = async (slot: TournamentSlotRef) =>
   parseApiResponse<TournamentState>(
     await fetch('/api/tournament/standings/publish', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(slot),
     }),
   );
@@ -61,7 +61,7 @@ export const broadcastGlobalRoom = async (
   parseApiResponse<{ updated: number; tournament: TournamentState; slot: TournamentSlotRef }>(
     await fetch('/api/tournament/room', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomId, roomPassword, ...slot }),
     }),
   );
@@ -70,7 +70,7 @@ export const saveEntrySlotsDraft = async (dayIndex: number, rows: EntrySlotRow[]
   parseApiResponse<TournamentState>(
     await fetch('/api/tournament/entry-slots/draft', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ day_index: dayIndex, rows }),
     }),
   );

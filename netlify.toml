@@ -11,6 +11,24 @@
   included_files = ["server/**", "src/types/**"]
 
 [[redirects]]
+  from = "/api/admin/login"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/verify"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/admin/logout"
+  to = "/.netlify/functions/admin-auth"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api"
   status = 200

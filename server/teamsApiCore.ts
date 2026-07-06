@@ -11,10 +11,9 @@ import {
 } from './tournamentSchedule';
 import { deleteMedia, parseImageDataUrl, readMedia, saveMedia } from './mediaStore';
 import { hydrateTournamentForClient, stripTournamentForPersist } from './tournamentPersist';
-import { createSupabasePersist, isSupabasePersistEnabled } from './supabasePersist';
+import { createSupabasePersist, isSupabasePersistEnabled, getSupabaseAdmin } from './supabasePersist';
 import { sendRegistrationEmail, sendStatusChangeEmail, sendRoomCodeEmail, sendOtpEmail, sendResetEmail } from './emailService';
 import { saveOtp, verifyAndConsumeOtp, getOtpData } from './otpStore';
-import { handleAdminLogin, handleAdminLogout, isAdminRequest as isAdminRequestFromAdminApi } from './adminApi';
 import type {
   EntrySlotRow,
   StandingsRow,
@@ -184,7 +183,39 @@ const stripSensitiveFields = <T extends { password_hash?: unknown; reset_token?:
   return safe as Omit<T, 'password_hash' | 'reset_token'>;
 };
 
-const isAdminRequest = isAdminRequestFromAdminApi;
+// Check if request is from authenticated admin via session cookie
+async function isAdminRequest(apiReq: TeamsApiRequest): Promise<boolean> {
+  const cookieHeader = apiReq.headers?.cookie || '';
+  const match = cookieHeader.match(/aevic_admin_session=([^;]+)/);
+  
+  if (!match) return false;
+  
+  const token = match[1];
+  const supabase = getSupabaseAdmin();
+  
+  if (!supabase) return false;
+  
+  try {
+    const { data: session, error } = await supabase
+      .from('admin_sessions')
+      .select('expires_at')
+      .eq('token', token)
+      .maybeSingle();
+    
+    if (error || !session) return false;
+    
+    // Check if session is expired
+    if (new Date(session.expires_at) < new Date()) {
+      // Clean up expired session
+      await supabase.from('admin_sessions').delete().eq('token', token);
+      return false;
+    }
+    
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const parseSlot = (body: Record<string, unknown>, tournament: TournamentState): TournamentSlotRef => ({
   day_index: Math.min(3, Math.max(1, Number(body.day_index ?? tournament.active_day_index ?? 1))),
@@ -421,67 +452,13 @@ export const createTeamsApiHandler = (dataDir: string) => {
       return json(200, publicTeams);
     }
 
-    if (method === 'POST' && pathname === '/api/admin/login') {
-      if (!(await checkRateLimit(clientIp, 'admin-login', 5, 15 * 60 * 1000, supabaseStore))) {
-        return json(429, { error: 'Çox sayda admin giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.' });
-      }
-      return handleAdminLogin(apiReq);
-    }
-
-    if (method === 'POST' && pathname === '/api/admin/logout') {
-      return handleAdminLogout(apiReq);
-    }
 
     if (method === 'GET' && pathname === '/api/teams') {
       const teams = await readTeams();
       const sorted = teams.sort((a, b) => a.team_name.localeCompare(b.team_name));
-      return json(200, isAdminRequest(apiReq) ? sorted : sorted.map(pickPublicTeam));
+      return json(200, (await isAdminRequest(apiReq)) ? sorted : sorted.map(pickPublicTeam));
     }
 
-    if (method === 'GET' && pathname === '/api/admin/export/csv') {
-      if (!isAdminRequest(apiReq)) return json(403, { error: 'İcazə yoxdur.' });
-      
-      const teams = await readTeams();
-      const headers = ['ID', 'Komanda Adı', 'Kapitan Adı', 'Kapitan WP', 'Email', 'Status', 'Oyunçu 1', 'Oyunçu 2', 'Oyunçu 3', 'Oyunçu 4', 'Oyunçu 5', 'Qeydiyyat Tarixi', 'Admin Qeydi'];
-      const csvRows = [headers.join(',')];
-      
-      for (const team of teams) {
-        const row = [
-          team.id,
-          team.team_name,
-          team.captain_name,
-          team.captain_contact,
-          team.email,
-          team.status,
-          team.player1_ign,
-          team.player2_ign,
-          team.player3_ign,
-          team.player4_ign,
-          team.player5_ign || '',
-          team.created_at,
-          team.admin_note || ''
-        ].map(field => {
-          const str = String(field || '');
-          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-            return `"${str.replace(/"/g, '""')}"`;
-          }
-          return str;
-        });
-        csvRows.push(row.join(','));
-      }
-      
-      const csvContent = csvRows.join('\n');
-      const buffer = Buffer.from(csvContent, 'utf8');
-      
-      return {
-        status: 200,
-        rawBody: buffer,
-        headers: {
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': 'attachment; filename="aevic-komandalar.csv"',
-        },
-      };
-    }
 
     if (method === 'GET' && pathname === '/api/teams/by-email') {
       const email = String(searchParams.get('email') || '').toLowerCase().trim();
@@ -492,7 +469,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
         return json(404, { error: 'Komanda tapılmadı.' });
       }
 
-      return json(200, isAdminRequest(apiReq) ? stripSensitiveFields(team) : pickPublicTeam(team));
+      return json(200, (await isAdminRequest(apiReq)) ? stripSensitiveFields(team) : pickPublicTeam(team));
     }
 
     if (method === 'GET' && pathname.startsWith('/api/teams/') && pathname !== '/api/teams/by-email') {
@@ -504,7 +481,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
         return json(404, { error: 'Komanda tapılmadı.' });
       }
 
-      return json(200, isAdminRequest(apiReq) ? stripSensitiveFields(team) : pickPublicTeam(team));
+      return json(200, (await isAdminRequest(apiReq)) ? stripSensitiveFields(team) : pickPublicTeam(team));
     }
 
     if (method === 'POST' && pathname === '/api/teams/login') {
@@ -829,7 +806,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
     }
 
     if (method === 'DELETE' && pathname.startsWith('/api/teams/')) {
-      if (!isAdminRequest(apiReq)) return json(403, { error: 'İcazə yoxdur.' });
+      if (!(await isAdminRequest(apiReq))) return json(403, { error: 'İcazə yoxdur.' });
 
       const teamId = pathname.replace('/api/teams/', '');
 
@@ -938,7 +915,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
       }
 
       // Admin-only update endpoint
-      if (!isAdminRequest(apiReq)) return json(403, { error: 'İcazə yoxdur.' });
+      if (!(await isAdminRequest(apiReq))) return json(403, { error: 'İcazə yoxdur.' });
 
       const patchBody = body as {
         newPassword?: string | null;
@@ -1024,7 +1001,7 @@ export const createTeamsApiHandler = (dataDir: string) => {
       return json(200, hydrateTournamentForClient(await readTournament()));
     }
 
-    if (['POST', 'PATCH', 'DELETE'].includes(method) && !isAdminRequest(apiReq)) {
+    if (['POST', 'PATCH', 'DELETE'].includes(method) && !(await isAdminRequest(apiReq))) {
       return json(403, { error: 'İcazə yoxdur.' });
     }
 
@@ -1435,9 +1412,6 @@ export const createTeamsApiHandler = (dataDir: string) => {
         });
       }
 
-      if (apiReq.pathname.startsWith('/api/admin')) {
-        return await handleTeams(apiReq);
-      }
 
       if (apiReq.pathname.startsWith('/api/media')) {
         return await handleMedia(apiReq);
