@@ -12,19 +12,19 @@
 
 [[redirects]]
   from = "/api/admin/login"
-  to = "/.netlify/functions/admin-auth"
+  to = "/.netlify/functions/admin-login"
   status = 200
   force = true
 
 [[redirects]]
   from = "/api/admin/verify"
-  to = "/.netlify/functions/admin-auth"
+  to = "/.netlify/functions/admin-verify"
   status = 200
   force = true
 
 [[redirects]]
   from = "/api/admin/logout"
-  to = "/.netlify/functions/admin-auth"
+  to = "/.netlify/functions/admin-logout"
   status = 200
   force = true
 
