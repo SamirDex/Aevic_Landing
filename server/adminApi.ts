@@ -42,6 +42,20 @@ export async function handleAdminLogin(apiReq: TeamsApiRequest): Promise<TeamsAp
   const { key } = body as { key?: string };
   const adminKey = process.env.ADMIN_SERVER_KEY?.trim() ?? '';
 
+  // DIAGNOSTIC LOGS
+  const trimmedKey = key?.trim() ?? '';
+  console.log('[ADMIN LOGIN DIAGNOSTIC]');
+  console.log('  - Incoming key length:', trimmedKey.length);
+  console.log('  - ADMIN_SERVER_KEY length:', adminKey.length);
+  console.log('  - Incoming key first 2 char codes:', trimmedKey.length >= 2 ? [trimmedKey.charCodeAt(0), trimmedKey.charCodeAt(1)] : 'N/A');
+  console.log('  - Incoming key last 2 char codes:', trimmedKey.length >= 2 ? [trimmedKey.charCodeAt(trimmedKey.length - 2), trimmedKey.charCodeAt(trimmedKey.length - 1)] : 'N/A');
+  console.log('  - ADMIN_SERVER_KEY first 2 char codes:', adminKey.length >= 2 ? [adminKey.charCodeAt(0), adminKey.charCodeAt(1)] : 'N/A');
+  console.log('  - ADMIN_SERVER_KEY last 2 char codes:', adminKey.length >= 2 ? [adminKey.charCodeAt(adminKey.length - 2), adminKey.charCodeAt(adminKey.length - 1)] : 'N/A');
+  console.log('  - ADMIN_SERVER_KEY is undefined:', process.env.ADMIN_SERVER_KEY === undefined);
+  console.log('  - ADMIN_SERVER_KEY is empty string:', process.env.ADMIN_SERVER_KEY === '');
+  console.log('  - Raw ADMIN_SERVER_KEY value:', process.env.ADMIN_SERVER_KEY ? `"${process.env.ADMIN_SERVER_KEY}"` : 'undefined');
+  // END DIAGNOSTIC LOGS
+
   if (!adminKey) {
     return { status: 500, payload: { error: 'Server configuration error: ADMIN_SERVER_KEY not set.' } };
   }

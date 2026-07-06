@@ -37,16 +37,6 @@ export function Footer() {
               </a>
             ))}
           </div>
-          <div className="footer__admin-gate">
-            <button
-              type="button"
-              className="footer__admin-trigger"
-              onClick={() => navigate('/admin')}
-              aria-label="Admin"
-            >
-              ⚙
-            </button>
-          </div>
         </div>
       </div>
     </footer>
