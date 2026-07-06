@@ -12,7 +12,6 @@
     "vite.config.ts",
     "plugins/teamsApi.ts",
     "server/teamsApiCore.ts",
-    "server/adminApi.ts",
     "server/tournamentSchedule.ts",
     "server/tournamentPersist.ts",
     "server/mediaStore.ts",
