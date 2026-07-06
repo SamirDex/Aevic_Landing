@@ -103,16 +103,54 @@ export const createSupabasePersist = () => {
   }
 
   const readTeams = async (): Promise<PersistedTeam[]> => {
-    const { data, error } = await client
-      .from('teams')
-      .select('id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,status,room_id,room_password,match_results,created_at,reset_token,rejection_reason')
-      .order('team_name');
+    // Try to select with rejection_reason column first (defensive for migration delays)
+    let selectQuery = 'id,team_name,captain_name,captain_contact,email,password_hash,player1_ign,player2_ign,player3_ign,player4_ign,player5_ign,logo_url,status,room_id,room_password,match_results,created_at,reset_token';
+    
+    try {
+      const { data, error } = await client
+        .from('teams')
+        .select(selectQuery + ',rejection_reason')
+        .order('team_name');
 
-    if (error) {
-      throw new Error(error.message);
+      if (error) {
+        // If rejection_reason column doesn't exist, fall back to query without it
+        if (error.message.includes('rejection_reason') || error.code === '42703') {
+          console.warn('[supabase] rejection_reason column not found, using fallback query');
+          const { data: fallbackData, error: fallbackError } = await client
+            .from('teams')
+            .select(selectQuery)
+            .order('team_name');
+          
+          if (fallbackError) {
+            throw new Error(fallbackError.message);
+          }
+          
+          return (fallbackData as unknown as TeamRow[]).map((row) => ({
+            ...mapTeamRow(row),
+            rejection_reason: null,
+          }));
+        }
+        throw new Error(error.message);
+      }
+
+      return (data as unknown as TeamRow[]).map(mapTeamRow);
+    } catch (err) {
+      // Final fallback - try without rejection_reason
+      console.error('[supabase] readTeams error, trying fallback:', err);
+      const { data, error } = await client
+        .from('teams')
+        .select(selectQuery)
+        .order('team_name');
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      return (data as unknown as TeamRow[]).map((row) => ({
+        ...mapTeamRow(row),
+        rejection_reason: null,
+      }));
     }
-
-    return (data as TeamRow[]).map(mapTeamRow);
   };
 
   const writeTeams = async (teams: PersistedTeam[]) => {

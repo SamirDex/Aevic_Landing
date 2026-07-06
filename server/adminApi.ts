@@ -57,7 +57,7 @@ export async function handleAdminLogin(apiReq: TeamsApiRequest): Promise<TeamsAp
     status: 200,
     payload: { ok: true },
     headers: {
-      'Set-Cookie': `aevic_admin_session=${sessionId}; HttpOnly; ${isProduction ? 'Secure;' : ''} SameSite=Strict; Path=/; Max-Age=86400`,
+      'Set-Cookie': `aevic_admin_session=${sessionId}; HttpOnly; ${isProduction ? 'Secure; ' : ''}SameSite=Lax; Path=/; Max-Age=86400`,
     },
   };
 }

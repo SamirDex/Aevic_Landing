@@ -113,10 +113,14 @@ export function LoginPage() {
           <Link to="/qeydiyyat" className="login-page__link">
             {t('login.register')}
           </Link>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className="login-page__link login-page__link--button"
-            onClick={() => setForgotEmail('')}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setForgotEmail('');
+            }}
           >
             {t('login.forgotPassword')}
           </button>

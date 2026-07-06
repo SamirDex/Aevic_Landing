@@ -416,10 +416,14 @@ export function RegisterSection() {
 
         <SectionReveal delay={0.14}>
           <form className="register-form" onSubmit={handleSubmit}>
-              <div className="register-form__two-column">
-                {/* Left Column - Team Info */}
-                <div className="register-form__column">
-                  <div className="register-form__section-title">{t('register.step1')}</div>
+              {/* Step 1: Team Info Card */}
+              <div className="register-form__card">
+                <div className="register-form__card-header">
+                  <div className="register-form__card-icon">🏆</div>
+                  <div className="register-form__card-title">Komanda Məlumatları</div>
+                  <div className="register-form__card-sub">Əsas məlumatları daxil edin</div>
+                </div>
+                <div className="register-form__card-body">
                   <label className="field">
                     <span>{t('register.teamName')}</span>
                     <input
@@ -505,74 +509,93 @@ export function RegisterSection() {
                     </label>
                   </div>
                 </div>
+              </div>
 
-                {/* Right Column - Players */}
-                <div className="register-form__column">
-                  <div className="register-form__section-title">Oyunçular</div>
-                  {(['player1', 'player2', 'player3', 'player4', 'player5'] as const).map((playerKey) => (
-                    <label key={playerKey} className="field">
-                      <span>{playerKey === 'player5' ? 'Oyunçu 5 IGN (Ehtiyat)' : getFieldLabel(playerKey as any, t)}</span>
-                      <input
-                        type="text"
-                        value={form[playerKey]}
-                        onChange={(event) => setField(playerKey, event.target.value)}
-                        placeholder={t('register.playerPlaceholder')}
-                        className={errors[playerKey] ? 'has-error' : ''}
-                      />
-                      {errors[playerKey] ? <small className="field-error">{errors[playerKey]}</small> : null}
-                    </label>
-                  ))}
+              {/* Step 2: Players Card */}
+              <div className="register-form__card">
+                <div className="register-form__card-header">
+                  <div className="register-form__card-icon">🎮</div>
+                  <div className="register-form__card-title">Oyunçular</div>
+                  <div className="register-form__card-sub">Komanda üzvlərinin IGN-ləri</div>
+                </div>
+                <div className="register-form__card-body">
+                  <div className="register-form__two-column">
+                    {(['player1', 'player2', 'player3', 'player4'] as const).map((playerKey) => (
+                      <label key={playerKey} className="field">
+                        <span>{getFieldLabel(playerKey as any, t)}</span>
+                        <input
+                          type="text"
+                          value={form[playerKey]}
+                          onChange={(event) => setField(playerKey, event.target.value)}
+                          placeholder={t('register.playerPlaceholder')}
+                          className={errors[playerKey] ? 'has-error' : ''}
+                        />
+                        {errors[playerKey] ? <small className="field-error">{errors[playerKey]}</small> : null}
+                      </label>
+                    ))}
+                  </div>
+                  <label className="field field--full">
+                    <span>Oyunçu 5 IGN (Ehtiyat - opsional)</span>
+                    <input
+                      type="text"
+                      value={form.player5}
+                      onChange={(event) => setField('player5', event.target.value)}
+                      placeholder={t('register.playerPlaceholder')}
+                      className={errors.player5 ? 'has-error' : ''}
+                    />
+                    {errors.player5 ? <small className="field-error">{errors.player5}</small> : null}
+                  </label>
                 </div>
               </div>
 
-              {/* Email - Full Width */}
-              <label className="field field--full">
-                <span>{t('register.email')}</span>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => setField('email', event.target.value)}
-                  placeholder={t('register.emailPlaceholder')}
-                  className={errors.email ? 'has-error' : ''}
-                />
-                {errors.email ? <small className="field-error">{errors.email}</small> : null}
-              </label>
+              {/* Step 3: Contact & Confirm Card */}
+              <div className="register-form__card">
+                <div className="register-form__card-header">
+                  <div className="register-form__card-icon">✉️</div>
+                  <div className="register-form__card-title">Əlaqə və Təsdiq</div>
+                  <div className="register-form__card-sub">Email və qaydalar</div>
+                </div>
+                <div className="register-form__card-body">
+                  <label className="field field--full">
+                    <span>{t('register.email')}</span>
+                    <input
+                      type="email"
+                      value={form.email}
+                      onChange={(event) => setField('email', event.target.value)}
+                      placeholder={t('register.emailPlaceholder')}
+                      className={errors.email ? 'has-error' : ''}
+                    />
+                    {errors.email ? <small className="field-error">{errors.email}</small> : null}
+                  </label>
 
-              <label className="consent">
-                <input
-                  type="checkbox"
-                  checked={form.agreed}
-                  onChange={(event) => setField('agreed', event.target.checked)}
-                />
-                <span className="consent__box" />
-                <span>
-                  <a
-                    href="/assets/reqlament.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="consent__link"
-                  >
-                    {t('nav.rules')}
-                  </a>
-                  {' '}ilə razıyam.
-                </span>
-              </label>
-              {errors.agreed ? <small className="consent__error field-error">{errors.agreed}</small> : null}
+                  <label className="consent">
+                    <input
+                      type="checkbox"
+                      checked={form.agreed}
+                      onChange={(event) => setField('agreed', event.target.checked)}
+                    />
+                    <span className="consent__box" />
+                    <span>
+                      <a
+                        href="/assets/reqlament.pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="consent__link"
+                      >
+                        {t('nav.rules')}
+                      </a>
+                      {' '}ilə razıyam.
+                    </span>
+                  </label>
+                  {errors.agreed ? <small className="consent__error field-error">{errors.agreed}</small> : null}
+                </div>
+              </div>
 
               {message ? <div className="form-message">{message}</div> : null}
 
               <div className="register-form__actions">
-                <button type="submit" className="button button--primary" disabled={status === 'loading'}>
-                  {status === 'loading' ? t('register.loading') : t('register.nextStep')}
-                </button>
-                <button 
-                  type="button" 
-                  className="button button--ghost"
-                  onClick={() => {
-                    // Save draft logic here
-                  }}
-                >
-                  {t('register.saveDraft')}
+                <button type="submit" className="button button--primary button--cta" disabled={status === 'loading'}>
+                  {status === 'loading' ? t('register.loading') : 'Qeydiyyatı Tamamla →'}
                 </button>
               </div>
 
