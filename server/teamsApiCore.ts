@@ -421,14 +421,11 @@ export const createTeamsApiHandler = (dataDir: string) => {
       return json(200, publicTeams);
     }
 
-    if (method === 'POST' && pathname === '/api/admin/verify') {
-      if (!(await checkRateLimit(clientIp, 'admin-verify', 5, 15 * 60 * 1000, supabaseStore))) {
+    if (method === 'POST' && pathname === '/api/admin/login') {
+      if (!(await checkRateLimit(clientIp, 'admin-login', 5, 15 * 60 * 1000, supabaseStore))) {
         return json(429, { error: 'Çox sayda admin giriş cəhdi. 15 dəqiqə sonra yenidən cəhd edin.' });
       }
-      if (isAdminRequest(apiReq)) {
-        return json(200, { ok: true });
-      }
-      return json(403, { error: 'İcazə yoxdur. Yanlış admin açarı.' });
+      return handleAdminLogin(apiReq);
     }
 
     if (method === 'POST' && pathname === '/api/admin/logout') {

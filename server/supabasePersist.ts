@@ -356,7 +356,7 @@ export const createSupabasePersist = () => {
       .select('*')
       .eq('ip', ip)
       .eq('endpoint', endpoint)
-      .gt('reset_at', now)
+      .gt('reset_at', new Date(now).toISOString())
       .maybeSingle();
 
     if (selectError) {
@@ -392,7 +392,7 @@ export const createSupabasePersist = () => {
         ip,
         endpoint,
         count: 1,
-        reset_at: resetAt,
+        reset_at: new Date(resetAt).toISOString(),
       });
 
     if (insertError) {
@@ -408,7 +408,7 @@ export const createSupabasePersist = () => {
     const { error } = await client
       .from('rate_limits')
       .delete()
-      .lt('reset_at', now);
+      .lt('reset_at', new Date(now).toISOString());
 
     if (error) {
       console.error('[rate-limit] Cleanup error:', error);
