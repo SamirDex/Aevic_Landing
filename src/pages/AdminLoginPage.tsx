@@ -13,7 +13,7 @@ export function AdminLoginPage() {
     setError('');
 
     try {
-      const res = await fetch('/api/admin/verify', {
+      const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
