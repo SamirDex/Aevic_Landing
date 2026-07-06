@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export function AdminLoginPage() {
@@ -7,8 +7,7 @@ export function AdminLoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setError('');
 
@@ -66,7 +65,7 @@ export function AdminLoginPage() {
           }}>Admin Panel</h1>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div>
           <div className="form-group" style={{ marginBottom: '1rem' }}>
             <label htmlFor="admin-key" style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--copy-soft)' }}>
               Admin açarı
@@ -78,6 +77,11 @@ export function AdminLoginPage() {
               onChange={(e) => setAdminInput(e.target.value)}
               placeholder="Admin açarı"
               autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSubmit();
+                }
+              }}
               style={{
                 width: '100%',
                 padding: '0.75rem',
@@ -87,7 +91,6 @@ export function AdminLoginPage() {
                 color: 'var(--color-copy)',
                 fontSize: '1rem'
               }}
-              required
             />
           </div>
 
@@ -106,7 +109,8 @@ export function AdminLoginPage() {
           )}
 
           <button
-            type="submit"
+            type="button"
+            onClick={handleSubmit}
             className="button button--primary"
             disabled={loading}
             style={{
@@ -117,7 +121,7 @@ export function AdminLoginPage() {
           >
             {loading ? 'Yüklənir...' : 'Daxil ol'}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
