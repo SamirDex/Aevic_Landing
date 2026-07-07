@@ -6,6 +6,7 @@ import { isValidPhone } from '../lib/phone';
 import { registerTeam } from '../lib/teamAuth';
 import { SectionReveal } from './SectionReveal';
 import { CapacityProgress } from './CapacityProgress';
+import '../pages/RegisterPage.css';
 
 type FormData = {
   teamName: string;

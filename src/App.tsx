@@ -9,6 +9,9 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ defa
 const StoryPage = lazy(() => import('./pages/StoryPage').then(m => ({ default: m.StoryPage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const VerifyPage = lazy(() => import('./pages/VerifyPage').then(m => ({ default: m.VerifyPage })));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage').then(m => ({ default: m.AdminLoginPage })));
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage').then(m => ({ default: m.AdminPanelPage })));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage })));
@@ -66,6 +69,9 @@ export default function App() {
               <Route path="/cedvel" element={<SchedulePage />} />
               <Route path="/panel" element={<DashboardPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/verify" element={<VerifyPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
             </Route>
             <Route path="/admin" element={<AdminLoginPage />} />
             <Route path="/admin/panel" element={<AdminPanelPage />} />
