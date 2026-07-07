@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, type TeamRecord } from '../context/AuthContext';
 import { Toast } from '../components/Toast';
+import './LoginPage.css';
 
 export function LoginPage() {
   const { t } = useTranslation();
