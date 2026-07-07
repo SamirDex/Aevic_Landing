@@ -1,0 +1,155 @@
+{
+  "global_room_id": null,
+  "global_room_password": null,
+  "week_label": "Week 01",
+  "league_title": "AEVIC ESPORTS LEAGUE – PUBG MOBILE",
+  "sharecard_background_id": null,
+  "active_day_index": 1,
+  "active_match_index": 0,
+  "days": [
+    {
+      "day_index": 1,
+      "day_label": "Gün 01",
+      "entry_slots_draft": null,
+      "entry_slots_published": null,
+      "matches": [
+        {
+          "match_index": 0,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 1,
+          "map": "miramar",
+          "map_label": "Miramar",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 2,
+          "map": "rondo",
+          "map_label": "Rondo",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 3,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        }
+      ]
+    },
+    {
+      "day_index": 2,
+      "day_label": "Gün 02",
+      "entry_slots_draft": null,
+      "entry_slots_published": null,
+      "matches": [
+        {
+          "match_index": 0,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 1,
+          "map": "miramar",
+          "map_label": "Miramar",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 2,
+          "map": "rondo",
+          "map_label": "Rondo",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 3,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        }
+      ]
+    },
+    {
+      "day_index": 3,
+      "day_label": "Gün 03",
+      "entry_slots_draft": null,
+      "entry_slots_published": null,
+      "matches": [
+        {
+          "match_index": 0,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 1,
+          "map": "miramar",
+          "map_label": "Miramar",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 2,
+          "map": "rondo",
+          "map_label": "Rondo",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        },
+        {
+          "match_index": 3,
+          "map": "erangel",
+          "map_label": "Erangel",
+          "room_id": null,
+          "room_password": null,
+          "standings_image_id": null,
+          "standings_draft": null,
+          "standings_published": null
+        }
+      ]
+    }
+  ]
+}
