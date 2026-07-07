@@ -2730,7 +2730,8 @@ p {
 
 .field--logo input[type='file'] {
   min-height: auto;
-  padding: 0.7rem 0.95rem;
+  padding: 0.7rem 1.375rem 0.7rem 0.95rem;
+  border-radius: 0;
   cursor: pointer;
 }
 
