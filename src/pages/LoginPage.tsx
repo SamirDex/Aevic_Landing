@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, type TeamRecord } from '../context/AuthContext';
 import { Toast } from '../components/Toast';
+import '../styles/auth.css';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -11,6 +12,7 @@ export function LoginPage() {
   const [forgotEmail, setForgotEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ export function LoginPage() {
       setToast({ message: t('common.invalidEmail'), type: 'error' });
       return;
     }
+    setForgotLoading(true);
     try {
       const res = await fetch('/api/teams/forgot-password', {
         method: 'POST',
@@ -64,88 +67,132 @@ export function LoginPage() {
       }
     } catch {
       setToast({ message: t('common.error'), type: 'error' });
+    } finally {
+      setForgotLoading(false);
     }
   };
 
   return (
-    <section className="login-page login-page--centered">
-      <div className="login-page__card">
-        <h1 className="login-page__title">{t('login.title')}</h1>
-        <p className="login-page__subtitle">{t('login.subtitle')}</p>
-        
-        <form onSubmit={handleSubmit} className="login-page__form">
-          {error && <div className="login-page__error">{error}</div>}
-
-          <div className="form-group">
-            <label htmlFor="login-email">{t('login.email')}</label>
-            <input
-              id="login-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder={t('login.emailPlaceholder')}
-            />
+    <section className="auth-container">
+      <div className="auth-content">
+        <div className="auth-card">
+          <div className="auth-header">
+            <h1 className="auth-title">{t('login.title')}</h1>
+            <p className="auth-subtitle">{t('login.subtitle')}</p>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="login-password">{t('login.password')}</label>
-            <input
-              id="login-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder={t('login.passwordPlaceholder')}
-            />
+          <div className="auth-divider"></div>
+          
+          <form onSubmit={handleSubmit} className="auth-form">
+            {error && (
+              <div className="auth-alert auth-alert--error">
+                <div className="auth-alert-icon">⚠️</div>
+                <div className="auth-alert-text">{error}</div>
+              </div>
+            )}
+
+            <div className="form-group">
+              <label htmlFor="login-email">{t('login.email')}</label>
+              <input
+                id="login-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder={t('login.emailPlaceholder')}
+                aria-label={t('login.email')}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="login-password">{t('login.password')}</label>
+              <input
+                id="login-password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder={t('login.passwordPlaceholder')}
+                aria-label={t('login.password')}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="auth-button auth-button--primary" 
+              disabled={loading}
+              aria-busy={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="auth-loading"></span> {t('common.loading')}
+                </>
+              ) : (
+                t('login.login')
+              )}
+            </button>
+          </form>
+
+          <div className="auth-footer">
+            <p className="auth-footer-text">
+              {t('login.noAccount')} <Link to="/qeydiyyat" className="auth-footer-link">{t('login.register')}</Link>
+            </p>
+            <div className="auth-links-group">
+              <button
+                type="button"
+                className="auth-footer-link"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setForgotEmail('');
+                }}
+                style={{ background: 'none', border: 'none', padding: 0 }}
+              >
+                {t('login.forgotPassword')} →
+              </button>
+            </div>
           </div>
-
-          <button type="submit" className="button button--primary" disabled={loading}>
-            {loading ? t('common.loading') : t('login.login')}
-          </button>
-        </form>
-
-        <div className="login-page__links">
-          <Link to="/qeydiyyat" className="login-page__link">
-            {t('login.register')}
-          </Link>
-          <button
-            type="button"
-            className="login-page__link login-page__link--button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setForgotEmail('');
-            }}
-          >
-            {t('login.forgotPassword')}
-          </button>
         </div>
       </div>
 
       {forgotEmail !== '' && (
-        <div className="login-page__forgot-modal">
-          <div className="login-page__forgot-card">
-            <h3 className="login-page__forgot-title">{t('login.forgotPassword')}</h3>
-            <p className="login-page__forgot-sub">{t('login.resetSent')}</p>
+        <div className="auth-overlay" onClick={() => setForgotEmail('')}>
+          <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="auth-header">
+              <h2 className="auth-title">{t('login.forgotPassword')}</h2>
+              <p className="auth-subtitle">{t('login.resetSent')}</p>
+            </div>
             
-            <form onSubmit={handleForgotPassword} className="login-page__forgot-form">
+            <form onSubmit={handleForgotPassword} className="auth-form" style={{ marginTop: '1.5rem' }}>
               <div className="form-group">
+                <label htmlFor="forgot-email">{t('login.email')}</label>
                 <input
+                  id="forgot-email"
                   type="email"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   placeholder={t('login.emailPlaceholder')}
                   required
+                  aria-label={t('login.email')}
                 />
               </div>
-              <div className="login-page__forgot-actions">
-                <button type="submit" className="button button--primary">
-                  {t('login.resetPassword')}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <button 
+                  type="submit" 
+                  className="auth-button auth-button--primary"
+                  disabled={forgotLoading}
+                >
+                  {forgotLoading ? (
+                    <>
+                      <span className="auth-loading"></span>
+                    </>
+                  ) : (
+                    t('login.resetPassword')
+                  )}
                 </button>
                 <button 
                   type="button" 
-                  className="button button--ghost"
+                  className="auth-button auth-button--ghost"
                   onClick={() => setForgotEmail('')}
                 >
                   {t('common.cancel')}

@@ -13,6 +13,9 @@ const AdminLoginPage = lazy(() => import('./pages/AdminLoginPage').then(m => ({ 
 const AdminPanelPage = lazy(() => import('./pages/AdminPanelPage').then(m => ({ default: m.AdminPanelPage })));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').then(m => ({ default: m.LeaderboardPage })));
 const SchedulePage = lazy(() => import('./pages/SchedulePage').then(m => ({ default: m.SchedulePage })));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const EmailVerifyPage = lazy(() => import('./pages/EmailVerifyPage').then(m => ({ default: m.EmailVerifyPage })));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 
 function ResetPasswordHandler() {
   const [resetData, setResetData] = useState<{ email: string; token: string } | null>(null);
@@ -66,7 +69,11 @@ export default function App() {
               <Route path="/cedvel" element={<SchedulePage />} />
               <Route path="/panel" element={<DashboardPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/giris" element={<LoginPage />} />
             </Route>
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/verify-email" element={<EmailVerifyPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/admin" element={<AdminLoginPage />} />
             <Route path="/admin/panel" element={<AdminPanelPage />} />
           </Routes>

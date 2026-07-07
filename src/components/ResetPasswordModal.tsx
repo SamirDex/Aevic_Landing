@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from 'react';
+import '../styles/auth.css';
 
 type Props = {
   email: string;
@@ -45,49 +46,74 @@ export function ResetPasswordModal({ email, token, onClose, onSuccess }: Props) 
   };
 
   return (
-    <div className="reset-overlay" onClick={onClose}>
-      <div className="reset-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="auth-overlay" onClick={onClose}>
+      <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
         {done ? (
           <>
-            <div className="reset-modal__icon">✓</div>
-            <h3>Şifrə dəyişdirildi!</h3>
-            <p>İndi yeni şifrənizlə daxil ola bilərsiniz.</p>
-            <button type="button" className="button button--primary" onClick={onSuccess}>
+            <div className="auth-success-icon">✓</div>
+            <div className="auth-header text-center">
+              <h3 className="auth-title" style={{ fontSize: '1.5rem' }}>Şifrə Dəyişdirildi!</h3>
+              <p className="auth-subtitle">İndi yeni şifrənizlə daxil ola bilərsiniz.</p>
+            </div>
+            <button type="button" className="auth-button auth-button--primary" onClick={onSuccess} style={{ width: '100%' }}>
               Panelə Keç →
             </button>
           </>
         ) : (
           <>
-            <h3>Yeni şifrə təyin et</h3>
-            <p className="reset-modal__sub">
-              <strong>{email}</strong> hesabı üçün
-            </p>
-            <form onSubmit={handleSubmit}>
+            <div className="auth-header">
+              <h2 className="auth-title">Yeni Şifrə Təyin Et</h2>
+              <p className="auth-subtitle">
+                <strong>{email}</strong> hesabı üçün
+              </p>
+            </div>
+            
+            <div className="auth-divider"></div>
+
+            <form onSubmit={handleSubmit} className="auth-form">
+              {message && (
+                <div className="auth-alert auth-alert--error">
+                  <div className="auth-alert-icon">⚠️</div>
+                  <div className="auth-alert-text">{message}</div>
+                </div>
+              )}
+
               <div className="form-group">
-                <label>Yeni şifrə</label>
+                <label htmlFor="new-password">Yeni Şifrə</label>
                 <input
+                  id="new-password"
                   type="password"
                   autoComplete="new-password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Ən azı 6 simvol"
                   required
+                  aria-label="Yeni şifrə"
                 />
               </div>
+
               <div className="form-group">
-                <label>Şifrəni təkrarla</label>
+                <label htmlFor="confirm-password">Şifrəni Təkrarla</label>
                 <input
+                  id="confirm-password"
                   type="password"
                   autoComplete="new-password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   placeholder="Şifrəni yenidən daxil edin"
                   required
+                  aria-label="Şifrəni təsdiqlə"
                 />
               </div>
-              {message && <p className="reset-modal__error">{message}</p>}
-              <button type="submit" className="button button--primary" disabled={loading}>
-                {loading ? 'Dəyişdirilir...' : 'Şifrəni Dəyiştir'}
+
+              <button type="submit" className="auth-button auth-button--primary" disabled={loading} style={{ width: '100%' }}>
+                {loading ? (
+                  <>
+                    <span className="auth-loading"></span> Dəyişdirilir...
+                  </>
+                ) : (
+                  'Şifrəni Dəyiştir'
+                )}
               </button>
             </form>
           </>

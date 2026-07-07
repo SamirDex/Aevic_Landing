@@ -6,6 +6,7 @@ import { isValidPhone } from '../lib/phone';
 import { registerTeam } from '../lib/teamAuth';
 import { SectionReveal } from './SectionReveal';
 import { CapacityProgress } from './CapacityProgress';
+import '../styles/auth.css';
 
 type FormData = {
   teamName: string;
@@ -406,52 +407,87 @@ export function RegisterSection() {
 
   if (otpStep === 'verify_email') {
     return (
-      <section className="register" id="register">
-        <div className="section-frame register__frame">
-          <div className="otp-box">
-            <h2 className="otp-box__title">Email Doğrulama</h2>
-            <p className="otp-box__sub">
-              <strong className="otp-box__email">{pendingEmail}</strong> ünvanına göndərilən
-              6 rəqəmli kodu daxil edin.
-            </p>
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              value={otpCode}
-              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-              placeholder="000000"
-              className="otp-box__input"
-            />
-            {otpError && <p className="otp-box__error">{otpError}</p>}
-            <div className="otp-box__actions">
-              <button
-                onClick={handleOtpSubmit}
-                disabled={otpCode.length !== 6 || otpLoading}
-                className="button button--primary"
-              >
-                {otpLoading ? 'Yoxlanılır...' : 'Təsdiqlə'}
-              </button>
-              <button
-                onClick={() => { setOtpStep('form'); setOtpCode(''); setOtpError(''); }}
-                className="button button--ghost"
-              >
-                Geri
-              </button>
+      <section className="auth-container">
+        <div className="auth-content">
+          <div className="auth-card">
+            <div className="auth-header">
+              <h2 className="auth-title">Email Doğrulama</h2>
+              <p className="auth-subtitle">
+                <strong>{pendingEmail}</strong> ünvanına göndərilən 6 rəqəmli kodu daxil edin
+              </p>
             </div>
-            <p className="otp-box__hint">
-              Kod gəlməyibsə, spam qovluğunu yoxlayın. Kod 10 dəqiqə etibarlıdır.
-            </p>
-            <button
-              onClick={handleResendOtp}
-              disabled={resendLoading}
-              className="otp-box__resend"
+
+            <div className="auth-divider"></div>
+
+            <form 
+              onSubmit={(e) => { 
+                e.preventDefault(); 
+                handleOtpSubmit(); 
+              }} 
+              className="auth-form"
             >
-              {resendLoading ? 'Göndərilir...' : 'Kodu yenidən göndər'}
-            </button>
-            {resendSuccess && (
-              <p className="otp-box__resend-ok">Kod yenidən göndərildi!</p>
-            )}
+              {otpError && (
+                <div className="auth-alert auth-alert--error">
+                  <div className="auth-alert-icon">⚠️</div>
+                  <div className="auth-alert-text">{otpError}</div>
+                </div>
+              )}
+
+              <div className="form-group">
+                <label htmlFor="otp-input">Doğrulama Kodu</label>
+                <input
+                  id="otp-input"
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  placeholder="000000"
+                  style={{ textAlign: 'center', letterSpacing: '0.5rem', fontSize: '1.25rem' }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={otpCode.length !== 6 || otpLoading}
+                className="auth-button auth-button--primary"
+              >
+                {otpLoading ? (
+                  <>
+                    <span className="auth-loading"></span> Yoxlanılır...
+                  </>
+                ) : (
+                  'Təsdiqlə'
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setOtpStep('form'); setOtpCode(''); setOtpError(''); }}
+                className="auth-button auth-button--ghost"
+              >
+                Geri Dön
+              </button>
+            </form>
+
+            <div className="auth-footer">
+              <p className="auth-footer-text" style={{ fontSize: '0.85rem', marginBottom: '1rem' }}>
+                Kod 10 dəqiqə etibarlıdır. Spam qovluğunu yoxlayın.
+              </p>
+              <button
+                onClick={handleResendOtp}
+                disabled={resendLoading}
+                className="auth-footer-link"
+                style={{ background: 'none', border: 'none', padding: 0 }}
+              >
+                {resendLoading ? 'Göndərilir...' : 'Kodu yenidən göndər'} →
+              </button>
+              {resendSuccess && (
+                <p style={{ color: '#4ADE80', fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                  ✓ Kod yenidən göndərildi!
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </section>
